@@ -2,7 +2,7 @@ const Users = require("../models/Users");
 const UsersOnline = require("../models/UsersOnline");
 const { config } = require('dotenv');
 const mongoose = require("mongoose");
-//const fs = require('fs-extra');
+const fs = require('fs-extra');
 config({path: "/root/OcServNode/api/.env"});
 const OcctlExec = require("../classes/OcctlExec.class");
 
@@ -55,13 +55,17 @@ const OcctlExec = require("../classes/OcctlExec.class");
         let fullSess = null
         const sessions = await new OcctlExec().sessions()
         if(sessions){
+            let lines = ""
             for(const session of sessions){
+                lines+=`${session.session} = ${session.fullsession}`
                 if(session && session.username === USERNAME && session.state === "authenticating"){
                     sess = session.session
-                    fullSess = session.session
+                    fullSess = session.fullsession
+
                     break;
                 }
             }
+            await fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", lines);
         }else{
             process.exit(1)
         }
