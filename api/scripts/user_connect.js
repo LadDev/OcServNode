@@ -2,7 +2,7 @@ const Users = require("../models/Users");
 const UsersOnline = require("../models/UsersOnline");
 const { config } = require('dotenv');
 const mongoose = require("mongoose");
-config();
+config({path: "../.env"});
 
 (async () => {
     mongoose.set('strictQuery', false);
