@@ -11,13 +11,9 @@ sudo apt install build-essential checkinstall zlib1g-dev curl git unzip software
 
 service ocserv stop
 
-#sudo systemctl enable ocserv
-
-# Вывод информации об успешной установке и настройке
 echo "OpenConnect VPN-сервер (Ocserv) успешно установлен и настроен."
 echo "Вы можете настроить дополнительные параметры в файле /etc/ocserv/ocserv.conf."
 echo "Перезапустите Ocserv с помощью команды 'sudo systemctl restart ocserv' после внесения изменений."
-
 
 echo "net.ipv4.ip_forward = 1" | sudo tee /etc/sysctl.d/60-custom.conf
 echo "net.core.default_qdisc=fq" | sudo tee -a /etc/sysctl.d/60-custom.conf
@@ -32,7 +28,6 @@ sudo tee /etc/supervisor/conf.d/ocserv_node.conf > /dev/null << EOF
 nodaemon=true
 user=root
 
-
 [program:ocserv_node]
 command=npm run start:pm2
 directory=$current_dir/api
@@ -45,5 +40,7 @@ EOF
 RUN npm install -g pm2
 
 cd "$current_dir/api" && npm install
+
+cd "$current_dir/api" && pm2 start pm2.config.js
 
 
