@@ -38,6 +38,7 @@ config();
                 uo.device = DEVICE
                 uo.remoteIp = IP_REAL
                 uo.ipv4 = IP_REMOTE
+                uo.status = "connect"
                 await uo.save()
             }else{
                 const uoNew = new UsersOnline({
@@ -47,6 +48,7 @@ config();
                     device: DEVICE,
                     remoteIp: IP_REAL,
                     ipv4: IP_REMOTE,
+                    status: "connect"
                 });
 
                 await uoNew.save()
