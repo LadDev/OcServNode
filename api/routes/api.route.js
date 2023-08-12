@@ -179,10 +179,10 @@ router.post("/ocserv/users/add", auth, async (req, res) => {
 
         const userEntry = `${username}:${group || "*"}:${hashedPassword}\n`;
 
-        fss.appendFileSync(process.env.OCSERV_CONF_PATH, userEntry);
+        fss.appendFileSync(process.env.OCSERV_PASS_PATH, userEntry);
 
         const users = await new OcctlExec().users()
-        const usersFile = fss.readFileSync(process.env.OCSERV_CONF_PATH, 'utf8').split("\n")
+        const usersFile = fss.readFileSync(process.env.OCSERV_PASS_PATH, 'utf8').split("\n")
         return res.status(200).json({code: 0, users,usersFile});
 
     } catch (error) {
