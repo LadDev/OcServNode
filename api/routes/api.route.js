@@ -9,7 +9,7 @@ const OcctlExec = require("../classes/OcctlExec.class");
 const editor = new EditorConf();
 const { version } = require('../package.json');
 const bcrypt = require('bcrypt');
-const Users = require("../models/Users")
+const Users = require("../models/Users");
 
 
 (async () => {
