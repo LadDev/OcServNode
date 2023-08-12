@@ -36,3 +36,29 @@ const schema = new Schema({
 })
 
 module.exports = model('Sessions',schema)
+
+/**
+ * Script invoked at Sat 12 Aug 2023 04:38:42 PM MSK
+ * HOSTNAME=
+ * PIDFILE=/run/ocserv.pid
+ * OCSERV_DNS4=1.1.1.1 8.8.8.8
+ * PWD=/
+ * IP_REAL=193.110.22.173
+ * USERNAME=hela
+ * LANG=en_US.UTF-8
+ * INVOCATION_ID=e3ebfb199fd7436e9c725e924cc4ddd3
+ * VHOST=default
+ * IP_LOCAL=10.0.0.1
+ * REASON=connect
+ * ID=5563
+ * OCSERV_DNS=1.1.1.1 8.8.8.8
+ * SHLVL=1
+ * GROUPNAME=home
+ * IP_REMOTE=10.0.0.195
+ * DEVICE=vpns0
+ * JOURNAL_STREAM=9:28386
+ * PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ * IP_REAL_LOCAL=31.172.78.14
+ * _=/usr/bin/printenv
+ * -----------------------------------
+ */
