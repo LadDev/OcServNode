@@ -75,7 +75,13 @@ async function start(){
             })
             await newNode.save()
         }else{
+            const response = await axios.get('https://ifconfig.me');
+            console.info(response)
+            updateEnvVariable("GLOBAL_IP", response.data)
+            config()
+
             node.hostname = os.hostname()
+            node.ip = response.data
             await node.save()
         }
 
