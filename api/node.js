@@ -79,11 +79,11 @@ async function start(){
         }
 
         app.listen(API_PORT, () => {
-            console.log(`Server admin app has bin started on port ${API_PORT}`)
+            console.info(`Server admin app has bin started on port ${API_PORT}`)
         })
     }catch (e){
         // В случае ошибки выводим сообщение об ошибке в консоль
-        console.log("Server Error:", e.message)
+        console.error("Server Error:", e.message)
         process.exit(0)
     }
 }
