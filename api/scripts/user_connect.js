@@ -2,7 +2,7 @@ const Users = require("../models/Users");
 const UsersOnline = require("../models/UsersOnline");
 const { config } = require('dotenv');
 const mongoose = require("mongoose");
-const fs = require('fs-extra');
+//const fs = require('fs-extra');
 config({path: "/root/OcServNode/api/.env"});
 
 (async () => {
@@ -13,9 +13,6 @@ config({path: "/root/OcServNode/api/.env"});
     await mongoose.connect("mongodb+srv://coincopytradingio:nTwVqDQrrA7hpnNV@tglab.ffyaxfd.mongodb.net/app?retryWrites=true&w=majority", {
         useUnifiedTopology: true,
     })
-
-    await fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", [...process.argv, "hello world"].join("\n"));
-
 
     let USERNAME = null
     let INVOCATION_ID = null
