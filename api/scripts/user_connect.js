@@ -17,7 +17,9 @@ config({path: "../.env"});
     let DEVICE = null
     let IP_REAL = null
     let IP_REMOTE = null
+    let IP_REAL_LOCAL = null
     let ID = null
+    let VHOST = null
     for(const arg of process.argv){
         const argArrTmp = arg.split("=")
         if(argArrTmp[0].startsWith("INVOCATION_ID")){
@@ -34,6 +36,10 @@ config({path: "../.env"});
             IP_REMOTE = argArrTmp[1]
         }else if(argArrTmp[0].startsWith("ID")){
             ID = argArrTmp[1]
+        }else if(argArrTmp[0].startsWith("VHOST")){
+            VHOST = argArrTmp[1]
+        }else if(argArrTmp[0].startsWith("IP_REAL_LOCAL")){
+            IP_REAL_LOCAL = argArrTmp[1]
         }
     }
 
@@ -50,6 +56,8 @@ config({path: "../.env"});
                 uo.device = DEVICE
                 uo.remoteIp = IP_REAL
                 uo.ipv4 = IP_REMOTE
+                uo.vhost = VHOST
+                uo.localDeviceIp = IP_REAL_LOCAL
                 uo.status = "connect"
                 await uo.save()
             }else{
@@ -62,6 +70,8 @@ config({path: "../.env"});
                     device: DEVICE,
                     remoteIp: IP_REAL,
                     ipv4: IP_REMOTE,
+                    vhost: VHOST,
+                    localDeviceIp: IP_REAL_LOCAL,
                     status: "connect"
                 });
 
