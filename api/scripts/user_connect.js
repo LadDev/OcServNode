@@ -77,13 +77,9 @@ config({path: "../.env"});
 
                 await uoNew.save()
             }
-            console.log("exit",0)
             process.exit(0)
         }
     }
-    console.log("exit",1)
     process.exit(1)
 
 })();
-
-// process.exit(0)
