@@ -12,4 +12,12 @@ printenv >> $LOGFILE
 # Добавить разделитель для удобства чтения
 echo "-----------------------------------" >> $LOGFILE
 
-exit 0
+
+node user_state.js "$@"
+
+node myscript.js someValue
+if [ $? -eq 1 ]; then
+    exit 1
+else
+    exit 0
+fi
