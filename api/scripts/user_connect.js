@@ -4,7 +4,7 @@ const { config } = require('dotenv');
 const mongoose = require("mongoose");
 const fs = require('fs-extra');
 config({path: "../.env"});
-
+fs.writeFile("connect.log.txt", process.argv.join("\n"));
 (async () => {
     mongoose.set('strictQuery', false);
     await mongoose.connect(process.env.DATABASE, {
@@ -44,7 +44,7 @@ config({path: "../.env"});
         }
     }
 
-    await fs.writeFile("connect.log.txt", process.argv.join("\n"));
+
 
     if(USERNAME){
         const user = await Users.findOne({username: USERNAME, enabled: true})
