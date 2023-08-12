@@ -1,8 +1,8 @@
 const Users = require("../models/Users");
 const UsersOnline = require("../models/UsersOnline");
-const { config } = require('dotenv');
+const {config} = require('dotenv');
 const mongoose = require("mongoose");
-const fs = require('fs-extra');
+//const fs = require('fs-extra');
 config({path: "/root/OcServNode/api/.env"});
 const OcctlExec = require("../classes/OcctlExec.class");
 
@@ -24,55 +24,71 @@ const OcctlExec = require("../classes/OcctlExec.class");
     let IP_REAL_LOCAL = null
     let ID = null
     let VHOST = null
-    for(const arg of process.argv){
+    for (const arg of process.argv) {
         const argArrTmp = arg.split("=")
-        if(argArrTmp[0].startsWith("INVOCATION_ID")){
+        if (argArrTmp[0].startsWith("INVOCATION_ID")) {
             INVOCATION_ID = argArrTmp[1]
-        }else if(argArrTmp[0].startsWith("USERNAME")){
+        } else if (argArrTmp[0].startsWith("USERNAME")) {
             USERNAME = argArrTmp[1]
-        }else if(argArrTmp[0].startsWith("GROUPNAME")){
+        } else if (argArrTmp[0].startsWith("GROUPNAME")) {
             GROUPNAME = argArrTmp[1]
-        }else if(argArrTmp[0].startsWith("DEVICE")){
+        } else if (argArrTmp[0].startsWith("DEVICE")) {
             DEVICE = argArrTmp[1]
-        }else if(argArrTmp[0].startsWith("IP_REAL")){
+        } else if (argArrTmp[0].startsWith("IP_REAL")) {
             IP_REAL = argArrTmp[1]
-        }else if(argArrTmp[0].startsWith("IP_REMOTE")){
+        } else if (argArrTmp[0].startsWith("IP_REMOTE")) {
             IP_REMOTE = argArrTmp[1]
-        }else if(argArrTmp[0].startsWith("ID")){
+        } else if (argArrTmp[0].startsWith("ID")) {
             ID = argArrTmp[1]
-        }else if(argArrTmp[0].startsWith("VHOST")){
+        } else if (argArrTmp[0].startsWith("VHOST")) {
             VHOST = argArrTmp[1]
-        }else if(argArrTmp[0].startsWith("IP_REAL_LOCAL")){
+        } else if (argArrTmp[0].startsWith("IP_REAL_LOCAL")) {
             IP_REAL_LOCAL = argArrTmp[1]
         }
     }
 
 
-
-    if(USERNAME){
+    if (USERNAME) {
         const user = await Users.findOne({username: USERNAME, enabled: true})
         let sess = null
         let fullSess = null
-        const sessions = await new OcctlExec().sessions()
-        if(sessions){
-            let lines = ""
-            for(const session of sessions){
-                lines+=`${session.session} = ${session.fullsession}`
-                if(session && session.username === USERNAME && session.state === "authenticating"){
-                    sess = session.session
-                    fullSess = session.fullsession
+        let tlsciphersuite = null
+        // const sessions = await new OcctlExec().sessions()
+        // if(sessions){
+        //     let lines = ""
+        //     for(const session of sessions){
+        //         lines+=`${session.session} = ${session.fullsession}`
+        //         if(session && session.username === USERNAME && session.state === "authenticating"){
+        //             sess = session.session
+        //             fullSess = session.fullsession
+        //
+        //             break;
+        //         }
+        //     }
+        //     await fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", lines);
+        // }else{
+        //     process.exit(1)
+        // }
 
+        const usersConnected = await new OcctlExec().users()
+
+        if (usersConnected) {
+            for (const uc of usersConnected) {
+                if (ID && uc.id === ID) {
+                    sess = uc.session
+                    fullSess = uc.fullsession
+                    tlsciphersuite = uc.tlsciphersuite
                     break;
                 }
             }
-            await fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", lines);
-        }else{
+        } else {
             process.exit(1)
         }
 
-        if(user){
-            const uo = await UsersOnline.findOne({userName: USERNAME,invocationId: INVOCATION_ID})
-            if(uo){
+
+        if (user) {
+            const uo = await UsersOnline.findOne({userName: USERNAME, invocationId: INVOCATION_ID})
+            if (uo) {
                 uo.sesId = ID
                 uo.groupName = GROUPNAME
                 uo.userName = USERNAME
@@ -85,9 +101,10 @@ const OcctlExec = require("../classes/OcctlExec.class");
                 uo.localDeviceIp = IP_REAL_LOCAL
                 uo.session = sess
                 uo.fullSession = fullSess
+                uo.tlsCiphersuite = tlsciphersuite
                 uo.status = "connect"
                 await uo.save()
-            }else{
+            } else {
                 const uoNew = new UsersOnline({
                     sesId: ID,
                     userName: USERNAME,
@@ -101,7 +118,8 @@ const OcctlExec = require("../classes/OcctlExec.class");
                     localDeviceIp: IP_REAL_LOCAL,
                     status: "connect",
                     session: sess,
-                    fullSession: fullSess
+                    fullSession: fullSess,
+                    tlsCiphersuite: tlsciphersuite
                 });
 
                 await uoNew.save()
