@@ -15,7 +15,7 @@
 
 node user_connect.js "$@"
 if [ $? -eq 1 ]; then
-    exit 0
+    exit 1
 else
     exit 0
 fi
