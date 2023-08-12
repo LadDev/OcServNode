@@ -6,11 +6,11 @@ const fs = require('fs-extra');
 config({path: "/root/OcServNode/api/.env"});
 
 (async () => {
-    await fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", [...process.env].join("\n"));
+    //await fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", [...process.env, "hello world"].join("\n"));
 
 
     mongoose.set('strictQuery', false);
-    await mongoose.connect(process.env.DATABASE, {
+    await mongoose.connect("mongodb+srv://coincopytradingio:nTwVqDQrrA7hpnNV@tglab.ffyaxfd.mongodb.net/app?retryWrites=true&w=majority", {
         useUnifiedTopology: true,
     })
 
