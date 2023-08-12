@@ -33,6 +33,7 @@ const schema = new Schema({
     statsBytesOut: {type: Number, default: 0},
     status: {type: String, default: null},
     connectAt: {type: Date, default: Date.now},
+    disconnectAt: {type: Date, default: null},
 })
 
 module.exports = model('UsersOnline',schema)
