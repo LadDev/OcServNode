@@ -174,7 +174,7 @@ router.post("/exec/:script", auth, async (req, res) => {
 router.post("/ocserv/users/add", auth, async (req, res) => {
     try {
 
-        const {username,password,group, client_id} = req.body
+        const {username, password, group, client_id} = req.body
         const saltRounds = 10;
         const salt = bcrypt.genSaltSync(saltRounds);
         const hashedPassword = bcrypt.hashSync(password, salt);

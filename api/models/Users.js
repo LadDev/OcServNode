@@ -9,4 +9,4 @@ const schema = new Schema({
     regDate: {type: Date, default: Date.now},
 })
 
-module.exports = model('Nodes',schema)
+module.exports = model('Users',schema)

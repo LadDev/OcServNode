@@ -35,7 +35,7 @@ const schema = new Schema({
     connectAt: {type: Date, default: Date.now},
 })
 
-module.exports = model('Nodes',schema)
+module.exports = model('Sessions',schema)
 
 /**
  * Script invoked at Sat 12 Aug 2023 04:38:42 PM MSK
