@@ -42,6 +42,10 @@ router.get("/git-update", auth, async (req, res) => {
     try {
         await editor.exec("git stash")
         await editor.exec("git pull --force")
+        await editor.exec("chmod +x scripts/connect-script.sh")
+        await editor.exec("chmod +x scripts/disconnect-script.sh")
+        await editor.exec("chmod +x scripts/user_connect.js")
+        await editor.exec("chmod +x scripts/user_disconnect.js")
         res.status(200).json({code: 0})
     } catch (error) {
         console.error(error)
