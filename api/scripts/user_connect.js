@@ -57,7 +57,7 @@ const OcctlExec = require("../classes/OcctlExec.class");
         const usersConnected = await new OcctlExec().users()
         if (usersConnected) {
             for (const uc of usersConnected) {
-                if (ID && uc.id === ID) {
+                if (Number(uc.id) === Number(ID)) {
                     sess = uc.session
                     fullSess = uc.fullsession
                     tlsciphersuite = uc.tlsciphersuite
