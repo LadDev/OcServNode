@@ -13,7 +13,7 @@ printenv >> $LOGFILE
 echo "-----------------------------------" >> $LOGFILE
 
 
-node /root/OcServNode/api/scripts/user_connect.js "$@"
+/bin/node /root/OcServNode/api/scripts/user_connect.js "$@"
 if [ $? -eq 1 ]; then
     exit 1
 else
