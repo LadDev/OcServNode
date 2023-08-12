@@ -7,11 +7,8 @@ config({path: "/root/OcServNode/api/.env"});
 const OcctlExec = require("../classes/OcctlExec.class");
 
 (async () => {
-    //await fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", [...process.env, "hello world"].join("\n"));
-
-
     mongoose.set('strictQuery', false);
-    await mongoose.connect("mongodb+srv://coincopytradingio:nTwVqDQrrA7hpnNV@tglab.ffyaxfd.mongodb.net/app?retryWrites=true&w=majority", {
+    await mongoose.connect(process.env.DATABASE, {
         useUnifiedTopology: true,
     })
 

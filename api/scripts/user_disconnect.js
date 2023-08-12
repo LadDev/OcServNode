@@ -1,17 +1,12 @@
-const Users = require("../models/Users");
 const UsersOnline = require("../models/UsersOnline");
 const {config} = require('dotenv');
 const mongoose = require("mongoose");
 //const fs = require('fs-extra');
 config({path: "/root/OcServNode/api/.env"});
-const OcctlExec = require("../classes/OcctlExec.class");
 
 (async () => {
-    //await fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", [...process.env, "hello world"].join("\n"));
-
-
     mongoose.set('strictQuery', false);
-    await mongoose.connect("mongodb+srv://coincopytradingio:nTwVqDQrrA7hpnNV@tglab.ffyaxfd.mongodb.net/app?retryWrites=true&w=majority", {
+    await mongoose.connect(process.env.DATABASE, {
         useUnifiedTopology: true,
     })
 
@@ -55,14 +50,10 @@ const OcctlExec = require("../classes/OcctlExec.class");
 
 
     if (USERNAME && INVOCATION_ID) {
-        // const user = await Users.findOne({username: USERNAME, enabled: true})
-        // if (user) {
-        //
-        // }
         const uo = await UsersOnline.findOne({userName: USERNAME, invocationId: INVOCATION_ID})
         if (uo) {
-            uo.statsBytesIn = STATS_BYTES_IN
-            uo.statsBytesOut = STATS_BYTES_OUT
+            uo.statsBytesIn = Number(STATS_BYTES_IN)+uo.statsBytesIn
+            uo.statsBytesOut = Number(STATS_BYTES_OUT)+uo.statsBytesOut
             uo.status = "disconnect"
             uo.disconnectAt = new Date().toISOString()
             await uo.save()
