@@ -68,7 +68,7 @@ async function start(){
         })
 
         const response = await axios.get('https://ifconfig.me');
-        console.log("Data",response);
+        console.log("Data",response.data);
 
         node.listen(API_PORT, () => {
             console.log(`Server admin app has bin started on port ${API_PORT}`)
