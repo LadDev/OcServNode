@@ -40,7 +40,7 @@ config({path: "../.env"});
     if(USERNAME){
         const user = await Users.findOne({username: USERNAME, enabled: true})
         if(user){
-            const uo = await UsersOnline.findOne({username: USERNAME,invocationId: INVOCATION_ID})
+            const uo = await UsersOnline.findOne({userName: USERNAME,invocationId: INVOCATION_ID})
             if(uo){
                 uo.sesId = ID
                 uo.groupName = GROUPNAME
