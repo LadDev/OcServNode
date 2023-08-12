@@ -37,6 +37,10 @@ stdout_logfile=/var/log/ocserv_node.log
 stderr_logfile=/var/log/ocserv_node_error.log
 EOF
 
+sudo tee $current_dir/api/.env > /dev/null << EOF
+
+EOF
+
 npm install -g pm2
 
 cd "$current_dir/api" && npm install

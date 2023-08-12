@@ -40,6 +40,7 @@ if(!process.env.UUID){
 
 
 const mongoose = require("mongoose");
+const axios = require("axios");
 
 const node = express();
 
@@ -65,6 +66,9 @@ async function start(){
         await mongoose.connect(process.env.DATABASE, {
             useUnifiedTopology: true,
         })
+
+        const response = await axios.get('https://ifconfig.me');
+        console.log(response);
 
         node.listen(API_PORT, () => {
             console.log(`Server admin app has bin started on port ${API_PORT}`)
