@@ -4,7 +4,7 @@ module.exports = {
             name: 'OcServNode',
             script: 'node.js',
             watch: true,
-            ignore_watch: ['node_modules', 'logs', "db", "conf", "certs", "scripts"],
+            ignore_watch: ['node_modules', 'logs', "db", "conf", "certs", "scripts", ".env"],
         },
     ],
 };
