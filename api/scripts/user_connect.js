@@ -49,7 +49,6 @@ const OcctlExec = require("../classes/OcctlExec.class");
 
 
     if (USERNAME) {
-        const user = await Users.findOne({username: USERNAME, enabled: true})
         let sess = null
         let fullSess = null
         let tlsciphersuite = null
@@ -68,7 +67,7 @@ const OcctlExec = require("../classes/OcctlExec.class");
             process.exit(1)
         }
 
-
+        const user = await Users.findOne({username: USERNAME, enabled: true})
         if (user) {
             const uo = await UsersOnline.findOne({userName: USERNAME, invocationId: INVOCATION_ID})
             if (uo) {
@@ -89,6 +88,7 @@ const OcctlExec = require("../classes/OcctlExec.class");
                 await uo.save()
             } else {
                 const uoNew = new UsersOnline({
+                    uid: user._id,
                     sesId: ID,
                     userName: USERNAME,
                     groupName: GROUPNAME,
