@@ -53,25 +53,8 @@ const OcctlExec = require("../classes/OcctlExec.class");
         let sess = null
         let fullSess = null
         let tlsciphersuite = null
-        // const sessions = await new OcctlExec().sessions()
-        // if(sessions){
-        //     let lines = ""
-        //     for(const session of sessions){
-        //         lines+=`${session.session} = ${session.fullsession}`
-        //         if(session && session.username === USERNAME && session.state === "authenticating"){
-        //             sess = session.session
-        //             fullSess = session.fullsession
-        //
-        //             break;
-        //         }
-        //     }
-        //     await fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", lines);
-        // }else{
-        //     process.exit(1)
-        // }
 
         const usersConnected = await new OcctlExec().users()
-
         if (usersConnected) {
             for (const uc of usersConnected) {
                 if (ID && uc.id === ID) {
