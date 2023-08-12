@@ -37,7 +37,7 @@ stdout_logfile=/var/log/ocserv_node.log
 stderr_logfile=/var/log/ocserv_node_error.log
 EOF
 
-RUN npm install -g pm2
+npm install -g pm2
 
 cd "$current_dir/api" && npm install
 
