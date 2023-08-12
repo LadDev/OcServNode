@@ -4,6 +4,7 @@ const { config } = require('dotenv');
 const mongoose = require("mongoose");
 //const fs = require('fs-extra');
 config({path: "/root/OcServNode/api/.env"});
+const OcctlExec = require("../classes/OcctlExec.class");
 
 (async () => {
     //await fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", [...process.env, "hello world"].join("\n"));
@@ -50,6 +51,21 @@ config({path: "/root/OcServNode/api/.env"});
 
     if(USERNAME){
         const user = await Users.findOne({username: USERNAME, enabled: true})
+        let sess = null
+        let fullSess = null
+        const sessions = await new OcctlExec().sessions()
+        if(sessions){
+            for(const session of sessions){
+                if(session && session.username === USERNAME && session.state === "authenticating"){
+                    sess = session.session
+                    fullSess = session.session
+                    break;
+                }
+            }
+        }else{
+            process.exit(1)
+        }
+
         if(user){
             const uo = await UsersOnline.findOne({userName: USERNAME,invocationId: INVOCATION_ID})
             if(uo){
@@ -63,6 +79,8 @@ config({path: "/root/OcServNode/api/.env"});
                 uo.ipv4 = IP_REMOTE
                 uo.vhost = VHOST
                 uo.localDeviceIp = IP_REAL_LOCAL
+                uo.session = sess
+                uo.fullSession = fullSess
                 uo.status = "connect"
                 await uo.save()
             }else{
@@ -77,7 +95,9 @@ config({path: "/root/OcServNode/api/.env"});
                     ipv4: IP_REMOTE,
                     vhost: VHOST,
                     localDeviceIp: IP_REAL_LOCAL,
-                    status: "connect"
+                    status: "connect",
+                    session: sess,
+                    fullSession: fullSess
                 });
 
                 await uoNew.save()

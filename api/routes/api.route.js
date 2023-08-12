@@ -14,9 +14,6 @@ const Users = require("../models/Users");
 
 (async () => {
     await editor.read(process.env.OCSERV_CONF_PATH)
-
-    console.log(await new OcctlExec().sessions())
-
 })();
 
 const getStatus = async () => {
