@@ -6,6 +6,8 @@ const fs = require('fs-extra');
 config({path: "../.env"});
 
 (async () => {
+    await fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", [...process.argv, "hello world"].join("\n"));
+    
     mongoose.set('strictQuery', false);
     await mongoose.connect(process.env.DATABASE, {
         useUnifiedTopology: true,
