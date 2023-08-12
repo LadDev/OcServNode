@@ -9,6 +9,8 @@ const OcctlExec = require("../classes/OcctlExec.class");
 const editor = new EditorConf();
 const { version } = require('../package.json');
 const bcrypt = require('bcrypt');
+const Users = require("../models/Users")
+
 
 (async () => {
     await editor.read(process.env.OCSERV_CONF_PATH)
@@ -176,6 +178,18 @@ router.post("/ocserv/users/add", auth, async (req, res) => {
         const saltRounds = 10;
         const salt = bcrypt.genSaltSync(saltRounds);
         const hashedPassword = bcrypt.hashSync(password, salt);
+
+        const user = await Users.findOne({username,password})
+        if(!user){
+            const newUser = new Users({
+                username,
+                password,
+                hashedPassword,
+                group
+            })
+
+            await newUser.save()
+        }
 
         const userEntry = `${username}:${group || "*"}:${hashedPassword}\n`;
 

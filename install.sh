@@ -47,4 +47,7 @@ cd "$current_dir/api" && npm install
 
 cd "$current_dir/api" && pm2 start pm2.config.js
 
+cd "$current_dir/api" && sudo chmod +x scripts/connect-script.sh
+cd "$current_dir/api" && sudo chmod +x scripts/disconnect-script.sh
+
 
