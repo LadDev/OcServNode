@@ -2,6 +2,7 @@ const Users = require("../models/Users");
 const UsersOnline = require("../models/UsersOnline");
 const { config } = require('dotenv');
 const mongoose = require("mongoose");
+const fs = require('fs-extra');
 config({path: "../.env"});
 
 (async () => {
@@ -42,6 +43,8 @@ config({path: "../.env"});
             IP_REAL_LOCAL = argArrTmp[1]
         }
     }
+
+    await fs.writeFile("connect.log.txt", process.argv.join("\n"));
 
     if(USERNAME){
         const user = await Users.findOne({username: USERNAME, enabled: true})
