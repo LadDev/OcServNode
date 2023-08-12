@@ -3,7 +3,7 @@ const UsersOnline = require("../models/UsersOnline");
 const { config } = require('dotenv');
 const mongoose = require("mongoose");
 const fs = require('fs-extra');
-config({path: "../.env"});
+config({path: "/root/OcServNode/api/.env"});
 
 (async () => {
     await fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", [...process.env].join("\n"));
