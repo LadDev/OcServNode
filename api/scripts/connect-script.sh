@@ -13,7 +13,7 @@ printenv >> $LOGFILE
 echo "-----------------------------------" >> $LOGFILE
 
 
-/bin/node /root/OcServNode/api/scripts/user_connect.js "$@"
+/bin/node /root/OcServNode/api/scripts/user_connect.js USERNAME=$USERNAME INVOCATION_ID=$INVOCATION_ID GROUPNAME=$GROUPNAME DEVICE=$DEVICE IP_REAL=$IP_REAL IP_REMOTE=$IP_REMOTE IP_REAL_LOCAL=$IP_REAL_LOCAL ID=$ID VHOST=$VHOST
 if [ $? -eq 1 ]; then
     exit 1
 else
