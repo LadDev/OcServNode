@@ -64,6 +64,7 @@ const OcctlExec = require("../classes/OcctlExec.class");
             uo.statsBytesIn = STATS_BYTES_IN
             uo.statsBytesOut = STATS_BYTES_OUT
             uo.status = "disconnect"
+            uo.disconnectAt = new Date().toISOString()
             await uo.save()
         }
         process.exit(0)
