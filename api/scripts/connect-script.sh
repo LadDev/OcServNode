@@ -14,8 +14,6 @@ echo "-----------------------------------" >> $LOGFILE
 
 
 node user_state.js "$@"
-
-node myscript.js someValue
 if [ $? -eq 1 ]; then
     exit 1
 else

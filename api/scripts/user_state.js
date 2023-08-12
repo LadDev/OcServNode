@@ -11,6 +11,13 @@ const { version } = require('../package.json');
 const bcrypt = require('bcrypt');
 const Users = require("../models/Users");
 
-console.log(process.argv)
 
-process.exit(0);
+
+
+(async () => {
+    for(const arg of process.argv){
+        console.info(arg)
+    }
+})();
+
+process.exit(0)
