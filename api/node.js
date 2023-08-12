@@ -39,20 +39,20 @@ if(!process.env.UUID){
     })();
 }
 
-const node = express();
+const app = express();
 
-node.use(cors())
+app.use(cors())
 
-node.use(bodyParser.urlencoded({ extended: false }))
-node.use(bodyParser.json({limit: "500mb"}));
-node.use(bodyParser.urlencoded({limit: "500mb", extended: true, parameterLimit:5000}));
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json({limit: "500mb"}));
+app.use(bodyParser.urlencoded({limit: "500mb", extended: true, parameterLimit:5000}));
 
-node.use(function (req, res, next) {
+app.use(function (req, res, next) {
     res.setHeader('X-Powered-By', 'LadDev Apps')
     next()
 })
 
-node.use("/api", require("./routes/api.route"))
+app.use("/api", require("./routes/api.route"))
 
 
 const API_PORT = process.env.API_PORT || 10080
@@ -85,7 +85,7 @@ async function start(){
             await node.save()
         }
 
-        node.listen(API_PORT, () => {
+        app.listen(API_PORT, () => {
             console.log(`Server admin app has bin started on port ${API_PORT}`)
         })
     }catch (e){
