@@ -44,6 +44,7 @@ config({path: "../.env"});
             if(uo){
                 uo.sesId = ID
                 uo.groupName = GROUPNAME
+                uo.userName = USERNAME
                 uo.invocationId = INVOCATION_ID
                 uo.uuid = process.env.UUID
                 uo.device = DEVICE
@@ -54,6 +55,7 @@ config({path: "../.env"});
             }else{
                 const uoNew = new UsersOnline({
                     sesId: ID,
+                    userName: USERNAME,
                     groupName: GROUPNAME,
                     invocationId: INVOCATION_ID,
                     uuid: process.env.UUID,
