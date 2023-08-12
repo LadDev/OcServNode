@@ -14,8 +14,9 @@ echo "-----------------------------------" >> $LOGFILE
 
 
 node user_connect.js "$@"
-if [ $? -eq 1 ]; then
-    exit 1
-else
-    exit 0
-fi
+#if [ $? -eq 1 ]; then
+#    exit 1
+#else
+#    exit 0
+#fi
+exit 0
