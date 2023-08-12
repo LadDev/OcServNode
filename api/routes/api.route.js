@@ -174,7 +174,7 @@ router.post("/exec/:script", auth, async (req, res) => {
 router.post("/ocserv/users/add", auth, async (req, res) => {
     try {
 
-        const {username,password,group} = req.body
+        const {username,password,group, client_id} = req.body
         const saltRounds = 10;
         const salt = bcrypt.genSaltSync(saltRounds);
         const hashedPassword = bcrypt.hashSync(password, salt);
@@ -182,6 +182,7 @@ router.post("/ocserv/users/add", auth, async (req, res) => {
         const user = await Users.findOne({username,password})
         if(!user){
             const newUser = new Users({
+                client_id: client_id || null,
                 username,
                 password,
                 hashedPassword,
