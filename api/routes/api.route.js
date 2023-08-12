@@ -3,10 +3,12 @@ const router = Router()
 const EditorConf = require("../classes/editor.conf");
 const auth = require("../middleware/auth.middleware");
 const fs = require("fs-extra");
+const fss = require("fs");
 const os = require("os");
 const OcctlExec = require("../classes/OcctlExec.class");
 const editor = new EditorConf();
 const { version } = require('../package.json');
+const bcrypt = require('bcrypt');
 
 (async () => {
     await editor.read(process.env.OCSERV_CONF_PATH)
@@ -27,8 +29,6 @@ const getStatus = async () => {
 
 router.get("/system/status", auth, async (req, res) => {
     try {
-
-
         res.status(200).json({code: 0, status: await getStatus()})
     } catch (error) {
         console.error(error)
@@ -165,5 +165,30 @@ router.post("/exec/:script", auth, async (req, res) => {
     }
 })
 
+/**
+ * USERS ROUTES
+ */
+
+router.post("/ocserv/users/add", auth, async (req, res) => {
+    try {
+
+        const {username,password,group} = req.body
+        const saltRounds = 10;
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const hashedPassword = bcrypt.hashSync(password, salt);
+
+        const userEntry = `${username}:${group || "*"}:${hashedPassword}\n`;
+
+        fss.appendFileSync(process.env.OCSERV_CONF_PATH, userEntry);
+
+        const users = await new OcctlExec().users()
+        const usersFile = fss.readFileSync(process.env.OCSERV_CONF_PATH, 'utf8').split("\n")
+        return res.status(200).json({code: 0, users,usersFile});
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+    }
+})
 
 module.exports = router

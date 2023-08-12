@@ -7,6 +7,7 @@ const Nodes = require("./models/Nodes")
 const os = require('os');
 const mongoose = require("mongoose");
 const axios = require("axios");
+const { version } = require('./package.json');
 config()
 
 function updateEnvVariable(key, value) {
@@ -67,6 +68,7 @@ async function start(){
                 uuid: process.env.UUID,
                 ip: response.data,
                 hostname: os.hostname(),
+                version
             })
             await newNode.save()
             updateEnvVariable("GLOBAL_IP", response.data)
@@ -75,6 +77,7 @@ async function start(){
             const response = await axios.get('https://ifconfig.me');
             node.hostname = os.hostname()
             node.ip = response.data
+            node.version = version
             await node.save()
         }
 
@@ -82,7 +85,6 @@ async function start(){
             console.info(`Server admin app has bin started on port ${API_PORT}`)
         })
     }catch (e){
-        // В случае ошибки выводим сообщение об ошибке в консоль
         console.error("Server Error:", e.message)
         process.exit(0)
     }
