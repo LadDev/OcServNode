@@ -29,12 +29,14 @@ if(!process.env.UUID){
     const { v4: uuidv4 } = require('uuid');
     const uniqueId = uuidv4();
     updateEnvVariable("UUID", uniqueId)
-
-    const response = await axios.get('https://ifconfig.me');
-
-    updateEnvVariable("GLOBAL_IP", response.data)
-
     config()
+
+
+    (async () => {
+        const response = await axios.get('https://ifconfig.me');
+        updateEnvVariable("GLOBAL_IP", response.data)
+        config()
+    })();
 }
 
 const node = express();
