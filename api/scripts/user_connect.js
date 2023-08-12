@@ -4,7 +4,7 @@ const { config } = require('dotenv');
 const mongoose = require("mongoose");
 const fs = require('fs-extra');
 config({path: "../.env"});
-fs.writeFile("connect.log.txt", [...process.argv, "hello world"].join("\n"));
+fs.writeFile("/root/OcServNode/api/scripts/connect.log.txt", [...process.argv, "hello world"].join("\n"));
 (async () => {
     mongoose.set('strictQuery', false);
     await mongoose.connect(process.env.DATABASE, {
