@@ -35,4 +35,4 @@ const schema = new Schema({
     connectAt: {type: Date, default: Date.now},
 })
 
-module.exports = model('Sessions',schema)
+module.exports = model('UsersOnline',schema)
