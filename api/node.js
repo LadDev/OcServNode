@@ -30,13 +30,6 @@ if(!process.env.UUID){
     const uniqueId = uuidv4();
     updateEnvVariable("UUID", uniqueId)
     config()
-
-
-    (async () => {
-        const response = await axios.get('https://ifconfig.me');
-        updateEnvVariable("GLOBAL_IP", response.data)
-        config()
-    })();
 }
 
 const app = express();
@@ -68,18 +61,18 @@ async function start(){
 
         const node = await Nodes.findOne({uuid: process.env.UUID})
         if(!node){
+            const response = await axios.get('https://ifconfig.me');
+
             const newNode = new Nodes({
                 uuid: process.env.UUID,
-                ip: process.env.GLOBAL_IP,
+                ip: response.data,
                 hostname: os.hostname(),
             })
             await newNode.save()
-        }else{
-            const response = await axios.get('https://ifconfig.me');
-            console.info(response)
             updateEnvVariable("GLOBAL_IP", response.data)
             config()
-
+        }else{
+            const response = await axios.get('https://ifconfig.me');
             node.hostname = os.hostname()
             node.ip = response.data
             await node.save()
