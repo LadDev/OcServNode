@@ -68,7 +68,7 @@ const OcctlExec = require("../classes/OcctlExec.class");
 
         const user = await Users.findOne({username: USERNAME, enabled: true})
         if (user) {
-            const uo = await UsersOnline.findOne({userName: USERNAME, invocationId: INVOCATION_ID})
+            const uo = await UsersOnline.findOne({userName: USERNAME, invocationId: INVOCATION_ID, status : "disconnect"})
             if (uo) {
                 uo.uid = user.id
                 uo.sesId = Number(ID)
