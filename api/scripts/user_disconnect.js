@@ -2,7 +2,8 @@ const UsersOnline = require("../models/UsersOnline");
 const {config} = require('dotenv');
 const mongoose = require("mongoose");
 //const fs = require('fs-extra');
-const DIR = __dirname.replace("/scripts")
+const DIR = `${__dirname}`.replace("/scripts")
+
 config({path: `${DIR}/.env`});
 
 (async () => {

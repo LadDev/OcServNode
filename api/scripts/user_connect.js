@@ -4,8 +4,8 @@ const {config} = require('dotenv');
 const mongoose = require("mongoose");
 //const fs = require('fs-extra');
 
-const DIR = __dirname.replace("/scripts")
-
+const DIR = `${__dirname}`.replace("/scripts")
+console.log(`${DIR}/.env`)
 config({path: `${DIR}/.env`});
 const OcctlExec = require("../classes/OcctlExec.class");
 
