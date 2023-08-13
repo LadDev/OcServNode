@@ -6,6 +6,7 @@ const schema = new Schema({
     version: {type: String, default: null},
     interfaces: {type: Array, default: []},
     status: {type: Object, default: null},
+    apiKey: {type: String, default: null},
     regDate: {type: Date, default: Date.now},
 })
 

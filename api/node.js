@@ -102,7 +102,8 @@ async function start(){
                 hostname: os.hostname(),
                 interfaces,
                 status,
-                version
+                version,
+                apiKey: process.env.UUID
             })
             await newNode.save()
             updateEnvVariable("GLOBAL_IP", response.data)
@@ -114,6 +115,7 @@ async function start(){
             node.version = version
             node.interfaces = interfaces
             node.status = status
+            node.apiKey = process.env.UUID
             await node.save()
         }
 
