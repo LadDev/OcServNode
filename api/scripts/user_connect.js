@@ -71,7 +71,7 @@ const OcctlExec = require("../classes/OcctlExec.class");
             const uo = await UsersOnline.findOne({userName: USERNAME, invocationId: INVOCATION_ID})
             if (uo) {
                 uo.uid = user.id
-                uo.sesId = ID
+                uo.sesId = Number(ID)
                 uo.groupName = GROUPNAME
                 uo.userName = USERNAME
                 uo.invocationId = INVOCATION_ID
@@ -91,7 +91,7 @@ const OcctlExec = require("../classes/OcctlExec.class");
             } else {
                 const uoNew = new UsersOnline({
                     uid: user.id,
-                    sesId: ID,
+                    sesId: Number(ID),
                     userName: USERNAME,
                     groupName: GROUPNAME,
                     invocationId: INVOCATION_ID,
