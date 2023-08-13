@@ -52,8 +52,6 @@ router.get("/system/status/interfaces", auth, async (req, res) => {
         const interfacesTMP = await editor.exec("ip -j -s addr | jq")
         let interfaces = []
 
-
-
         if(interfacesTMP.out){
             const interfacesJSON = JSON.parse(interfacesTMP.out)
             for(const interf of interfacesJSON){
@@ -235,6 +233,22 @@ router.post("/ocserv/users/add", auth, async (req, res) => {
         const users = await new OcctlExec().users()
         const usersFile = fss.readFileSync(process.env.OCSERV_PASS_PATH, 'utf8').split("\n")
         return res.status(200).json({code: 0, users,usersFile});
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+    }
+})
+
+router.post("/ocserv/users/sync", auth, async (req, res) => {
+    try {
+
+        const users = await Users.find({});
+        if(users){
+
+        }
+
+        return res.status(200).json({code: 0, users});
 
     } catch (error) {
         console.error(error)
