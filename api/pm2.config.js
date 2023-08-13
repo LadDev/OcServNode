@@ -6,5 +6,11 @@ module.exports = {
             watch: true,
             ignore_watch: ['node_modules', 'logs', "db", "conf", "certs", "scripts", ".env"],
         },
+        {
+            name: 'OcServNode-UsersOnline',
+            script: 'cron/users_online.cron.js',
+            watch: true,
+            ignore_watch: ['node_modules', 'logs', "db", "conf", "certs", "scripts", ".env"],
+        },
     ],
 };
