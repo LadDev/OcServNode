@@ -9,6 +9,8 @@ const axios = require("axios");
 const { version } = require('./package.json');
 config()
 const {dbConnect} = require("./db.connector")
+const EditorConf = require("./classes/editor.conf");
+const editor = new EditorConf();
 
 function updateEnvVariable(key, value) {
     const envPath = '.env';
