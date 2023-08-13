@@ -109,8 +109,8 @@ const Nodes = require("../models/Nodes");
             try{
                 const node = await Nodes.findOne({uuid: process.env.UUID})
                 if(node && node.status && node.status.occtlStatus && node.status.occtlStatus !== {}){
-                    node.status.occtlStatus.activesessions += 1
-                    node.status.occtlStatus.totalsessions += 1
+                    node.status.occtlStatus.activesessions = usersConnected.length
+                    node.status.occtlStatus.totalsessions = usersConnected.length
                     await node.save()
                 }
             }catch (e){}
