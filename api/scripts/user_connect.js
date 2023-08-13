@@ -86,6 +86,7 @@ const OcctlExec = require("../classes/OcctlExec.class");
                 uo.tlsCiphersuite = tlsciphersuite
                 uo.status = "connect"
                 uo.connectAt = new Date().toISOString()
+                uo.disconnectAt = null
                 await uo.save()
             } else {
                 const uoNew = new UsersOnline({
