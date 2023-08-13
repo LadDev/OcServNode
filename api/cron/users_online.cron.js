@@ -28,8 +28,12 @@ start().then(()=>{
 
 })
 
-const updateOnlineUsers = async () => {
-
+const updateOnlineUsers = async (userOnline) => {
+    if(userOnline){
+        const uoDB = await UsersOnline.findOne({sesId: userOnline.id, username: userOnline.username, fullSession: userOnline.fullsession})
+        console.log(uoDB)
+    }
+    return 1;
 }
 
 
@@ -37,7 +41,9 @@ const usersOnlineTask = async () => {
     try{
         const uo = await new OcctlExec().users()
         if(uo){
-            console.log(uo)
+            for(const userOnline of uo){
+                await updateOnlineUsers(userOnline)
+            }
         }
     }catch (error) {
         console.error(error)
