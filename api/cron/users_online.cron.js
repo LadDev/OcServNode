@@ -30,6 +30,7 @@ start().then(()=>{
 
 const updateOnlineUsers = async (userOnline) => {
     if(userOnline){
+        console.log(userOnline)
         const uoDB = await UsersOnline.findOne({sesId: Number(userOnline.id), username: userOnline.username, fullSession: userOnline.fullsession})
         console.log(uoDB)
     }
