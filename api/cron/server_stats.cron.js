@@ -33,7 +33,8 @@ const serverStats = async () => {
     const distro = await editor.getLinuxDistro()
     const freemem = os.freemem()
     const totalmem = os.totalmem()
-    const occtlStatus = await new OcctlExec().status()
+    let occtlStatus = await new OcctlExec().status()
+    if(occtlStatus === {}) occtlStatus = null;
     const uuid = process.env.UUID
 
 
