@@ -4,6 +4,7 @@ const schema = new Schema({
     ip: {type: String, default: null},
     hostname: {type: String, default: null},
     version: {type: String, default: null},
+    interfaces: {type: Array, default: []},
     regDate: {type: Date, default: Date.now},
 })
 

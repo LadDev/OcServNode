@@ -55,7 +55,21 @@ async function start(){
     try{
         await dbConnect()
 
-        //const response = await axios.get('https://ifconfig.me');
+        let interfaces = []
+
+        try{
+            const interfacesTMP = await editor.exec("ip -j -s addr | jq")
+            if(interfacesTMP.out){
+                const interfacesJSON = JSON.parse(interfacesTMP.out)
+                for(const interf of interfacesJSON){
+                    if(interf.ifname && interf.ifname !== "lo" && !interf.ifname.startsWith("vpns")){
+                        interfaces.push(interf)
+                    }
+                }
+            }
+        }catch (e) {
+            console.error(e)
+        }
 
         const node = await Nodes.findOne({uuid: process.env.UUID})
         if(!node){
@@ -65,6 +79,7 @@ async function start(){
                 uuid: process.env.UUID,
                 ip: response.data,
                 hostname: os.hostname(),
+                interfaces,
                 version
             })
             await newNode.save()
@@ -75,6 +90,7 @@ async function start(){
             node.hostname = os.hostname()
             node.ip = response.data
             node.version = version
+            node.interfaces = interfaces
             await node.save()
         }
 
