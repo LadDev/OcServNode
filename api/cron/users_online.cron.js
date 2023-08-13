@@ -26,7 +26,7 @@ async function start(){
 
 const updateOnlineUsers = async (userOnline) => {
     if(userOnline){
-        console.info(userOnline)
+        //console.info(userOnline)
         const uoDB = await UsersOnline.findOne({sesId: Number(userOnline.id), userName: userOnline.username, fullSession: userOnline.fullsession})
         if(uoDB){
 
