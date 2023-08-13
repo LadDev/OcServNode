@@ -10,6 +10,7 @@ const { version } = require('./package.json');
 config()
 const {dbConnect} = require("./db.connector")
 const EditorConf = require("./classes/editor.conf");
+const OcctlExec = require("./classes/OcctlExec.class");
 const editor = new EditorConf();
 
 function updateEnvVariable(key, value) {
@@ -73,6 +74,23 @@ async function start(){
             console.error(e)
         }
 
+        let status = null
+
+        try{
+            const cpuUsage = await editor.getCpuUsage();
+            const diskUsage = await editor.getDiskUsage();
+            const platform = os.platform()
+            const distro = await editor.getLinuxDistro()
+            const freemem = os.freemem()
+            const totalmem = os.totalmem()
+            const occtlStatus = await new OcctlExec().status()
+            const uuid = process.env.UUID
+
+            status = {cpuUsage, diskUsage, platform, distro, freemem, totalmem, occtlStatus, version, uuid}
+        }catch (e) {
+            console.error(e)
+        }
+
         const node = await Nodes.findOne({uuid: process.env.UUID})
         if(!node){
             const response = await axios.get('https://ifconfig.me');
@@ -82,6 +100,7 @@ async function start(){
                 ip: response.data,
                 hostname: os.hostname(),
                 interfaces,
+                status,
                 version
             })
             await newNode.save()
@@ -93,6 +112,7 @@ async function start(){
             node.ip = response.data
             node.version = version
             node.interfaces = interfaces
+            node.status = status
             await node.save()
         }
 
