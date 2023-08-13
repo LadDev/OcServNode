@@ -4,6 +4,7 @@ const Sessions = require("../models/Sessions");
 const DIR = `${__dirname}`.replace("/scripts", "")
 config({path: `${DIR}/.env`});
 const {dbConnect} = require("../db.connector");
+const Nodes = require("../models/Nodes");
 
 (async () => {
     await dbConnect()
@@ -64,6 +65,20 @@ const {dbConnect} = require("../db.connector");
             sessionDB.statsBytesOut = Number(STATS_BYTES_OUT)
             await sessionDB.save()
         }
+
+        try{
+            const node = await Nodes.findOne({uuid: process.env.UUID})
+            if(node && node.status && node.status.occtlStatus && node.status.occtlStatus !== {}){
+                if(node.status.occtlStatus.activesessions > 0) {
+                    node.status.occtlStatus.activesessions -= 1
+                }
+                if(node.status.occtlStatus.totalsessions > 0) {
+                    node.status.occtlStatus.totalsessions -= 1
+                }
+                await node.save()
+            }
+        }catch (e){}
+
         process.exit(0)
     }
     process.exit(1)

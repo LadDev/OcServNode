@@ -5,6 +5,7 @@ const DIR = `${__dirname}`.replace("/scripts","")
 config({path: `${DIR}/.env`});
 const {dbConnect} = require("../db.connector");
 const OcctlExec = require("../classes/OcctlExec.class");
+const Nodes = require("../models/Nodes");
 
 (async () => {
     await dbConnect()
@@ -105,6 +106,15 @@ const OcctlExec = require("../classes/OcctlExec.class");
 
                 await uoNew.save()
             }
+            try{
+                const node = await Nodes.findOne({uuid: process.env.UUID})
+                if(node && node.status && node.status.occtlStatus && node.status.occtlStatus !== {}){
+                    node.status.occtlStatus.activesessions += 1
+                    node.status.occtlStatus.totalsessions += 1
+                    await node.save()
+                }
+            }catch (e){}
+
             process.exit(0)
         }
     }
