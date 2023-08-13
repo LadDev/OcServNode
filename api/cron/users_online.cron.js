@@ -1,6 +1,4 @@
 const cron = require('node-cron');
-const {exec} = require("child_process");
-const {DateTime} = require("luxon");
 const { config } = require('dotenv')
 const mongoose = require("mongoose");
 const UsersOnline = require("../models/UsersOnline");
@@ -28,9 +26,11 @@ async function start(){
 
 const updateOnlineUsers = async (userOnline) => {
     if(userOnline){
-        console.log(userOnline)
+        console.info(userOnline)
         const uoDB = await UsersOnline.findOne({sesId: Number(userOnline.id), userName: userOnline.username, fullSession: userOnline.fullsession})
-        console.log(uoDB)
+        if(uoDB){
+
+        }
     }
     return 1;
 }
