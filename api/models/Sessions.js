@@ -15,6 +15,8 @@ const schema = new Schema({
     tls_auth_ok: {type: Number, default: 0},
     in_use: {type: Number, default: 0},
     connected: {type: Boolean, default: false},
+    statsBytesIn: {type: Number, default: 0},
+    statsBytesOut: {type: Number, default: 0},
     created: {type: Date, default: Date.now},
     closed: {type: Date, default: null},
 })

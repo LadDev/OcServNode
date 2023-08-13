@@ -64,6 +64,8 @@ config({path: `${DIR}/.env`});
             const sessionDB = await Sessions.findOne({uuid: uo.uuid, uid: uo.uid,userName: uo.userName, session: uo.session, fullSession: uo.fullSession});
             sessionDB.connected = false
             sessionDB.closed = new Date().toISOString()
+            sessionDB.statsBytesIn = Number(STATS_BYTES_IN)
+            sessionDB.statsBytesOut = Number(STATS_BYTES_OUT)
             await sessionDB.save()
         }
         process.exit(0)

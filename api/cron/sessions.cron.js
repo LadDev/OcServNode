@@ -41,6 +41,8 @@ const updateOnlineSessions = async (userSession) => {
                 sessionDB.connected = true
                 sessionDB.created = userSession.created || null
                 sessionDB.closed =  null
+                sessionDB.statsBytesIn = Number(uoDB.rx)
+                sessionDB.statsBytesOut = Number(uoDB.tx)
                 await sessionDB.save()
             }else{
                 const newSessDB = new Sessions({
@@ -60,7 +62,9 @@ const updateOnlineSessions = async (userSession) => {
                     in_use: userSession.in_use || 0,
                     connected: true,
                     created: userSession.created || null,
-                    closed:  null
+                    closed:  null,
+                    statsBytesIn: Number(uoDB.rx),
+                    statsBytesOut: Number(uoDB.tx)
                 });
                 await newSessDB.save()
             }
