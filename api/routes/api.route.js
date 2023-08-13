@@ -38,6 +38,18 @@ router.get("/system/status", auth, async (req, res) => {
     }
 })
 
+router.get("/system/status/interfaces", auth, async (req, res) => {
+    try {
+
+        const interfaces = await editor.exec("ip -j -s addr | jq")
+
+        res.status(200).json({code: 0, interfaces})
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+    }
+})
+
 router.get("/git-update", auth, async (req, res) => {
     try {
         await editor.exec("git stash")

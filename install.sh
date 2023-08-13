@@ -7,7 +7,7 @@ sudo apt update && apt upgrade -y
 
 # Установка необходимых пакетов
 sudo apt install -y ocserv certbot
-sudo apt install build-essential checkinstall zlib1g-dev curl git unzip software-properties-common supervisor apt-utils iputils-ping traceroute dnsutils python3 pip git nano net-tools iproute2 iptables -y
+sudo apt install build-essential checkinstall zlib1g-dev curl git unzip software-properties-common supervisor apt-utils iputils-ping traceroute dnsutils python3 pip git nano net-tools iproute2 iptables jq -y
 
 service ocserv stop
 
