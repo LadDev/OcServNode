@@ -53,6 +53,7 @@ const {dbConnect} = require("../db.connector");
             uo.statsBytesIn = Number(STATS_BYTES_IN)+uo.statsBytesIn
             uo.statsBytesOut = Number(STATS_BYTES_OUT)+uo.statsBytesOut
             uo.status = "disconnect"
+            uo.sesId = null
             uo.disconnectAt = new Date().toISOString()
             await uo.save()
 
