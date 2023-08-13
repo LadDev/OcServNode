@@ -98,7 +98,7 @@ router.post("/configs/create", auth, async (req, res) => {
     try {
         const {config} = req.body
         await editor.create(config)
-        //await editor.exec("service ocserv restart")
+        await editor.exec("service ocserv restart")
         res.status(200).json({code: 0, params: config || {}})
     } catch (error) {
         console.error(error)
