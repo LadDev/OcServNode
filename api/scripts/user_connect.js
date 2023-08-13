@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 //const fs = require('fs-extra');
 config({path: "/root/OcServNode/api/.env"});
 const OcctlExec = require("../classes/OcctlExec.class");
-
+console.log(__dirname);
 (async () => {
     mongoose.set('strictQuery', false);
     await mongoose.connect(process.env.DATABASE, {
