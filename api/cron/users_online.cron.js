@@ -26,10 +26,30 @@ async function start(){
 
 const updateOnlineUsers = async (userOnline) => {
     if(userOnline){
-        //console.info(userOnline)
-        const uoDB = await UsersOnline.findOne({sesId: Number(userOnline.id), userName: userOnline.username, fullSession: userOnline.fullsession})
-        if(uoDB){
 
+        const uoDB = await UsersOnline.findOne({sesId: Number(userOnline.id), userName: userOnline.username})
+        if(uoDB){
+            uoDB.groupName = userOnline.groupname || "*"
+            uoDB.vhost = userOnline.vhost || null
+            uoDB.device = userOnline.device || null
+            uoDB.mtu =  userOnline.mtu?Number(userOnline.mtu):0
+            uoDB.remoteIp = userOnline.remoteip || null
+            uoDB.location = userOnline.location || null
+            uoDB.localDeviceIp = userOnline.localdeviceip || null
+            uoDB.ipv4 = userOnline.ipv4 || null
+            uoDB.ptpipv4 = userOnline.ptpipv4 || null
+            uoDB.rx = userOnline.rx?Number(userOnline.rx):0
+            uoDB.tx = userOnline.tx?Number(userOnline.tx):0
+            uoDB.averageRx = userOnline.averagerx || null
+            uoDB.averageTx = userOnline.averagetx || null
+            uoDB.dpd = userOnline.dpd?Number(userOnline.dpd):0
+            uoDB.keepalive =  userOnline.keepalive?Number(userOnline.keepalive):0
+            uoDB.session = userOnline.session || null
+            uoDB.fullSession = userOnline.fullsession || null
+            uoDB.tlsCiphersuite = userOnline.tlsciphersuite || null
+            uoDB.dns = userOnline.dns || []
+            uoDB.status = userOnline.state || "unknown"
+            await uoDB.save()
         }
     }
     return 1;
