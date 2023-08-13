@@ -24,9 +24,7 @@ async function start(){
     }
 }
 
-start().then(()=>{
 
-})
 
 const updateOnlineUsers = async (userOnline) => {
     if(userOnline){
@@ -57,6 +55,8 @@ const usersOnlineTask = async () => {
 const task = cron.schedule('*/10 * * * * *', ()=>{
     return usersOnlineTask();
 });
-
+start().then(()=>{
 // Запустите задачу
-task.start();
+    task.start();
+})
+
