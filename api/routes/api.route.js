@@ -171,7 +171,7 @@ router.post("/configs/cerificates", auth, async (req, res) => {
         await editor.setParam("server-key", "/var/certs/privkey.pem")
 
 
-        //await editor.exec("service ocserv start")
+        await editor.exec("service ocserv start")
 
         res.status(200).json({code: 0, params: editor.params})
     } catch (error) {
