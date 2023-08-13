@@ -103,7 +103,8 @@ async function start(){
                 interfaces,
                 status,
                 version,
-                apiKey: process.env.API_KEY
+                apiKey: process.env.API_KEY,
+                port: process.env.API_PORT || 10080
             })
             await newNode.save()
             updateEnvVariable("GLOBAL_IP", response.data)
@@ -116,6 +117,7 @@ async function start(){
             node.interfaces = interfaces
             node.status = status
             node.apiKey = process.env.API_KEY
+            node.port = process.env.API_PORT || 10080
             await node.save()
         }
 

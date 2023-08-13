@@ -7,6 +7,7 @@ const schema = new Schema({
     interfaces: {type: Array, default: []},
     status: {type: Object, default: null},
     apiKey: {type: String, default: null},
+    port: {type: Number, default: null},
     regDate: {type: Date, default: Date.now},
 })
 
