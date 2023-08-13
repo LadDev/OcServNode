@@ -44,7 +44,7 @@ router.get("/system/status/interfaces", auth, async (req, res) => {
         const interfacesTMP = await editor.exec("ip -j -s addr | jq")
         let interfaces = []
 
-        if(interfacesTMP.out && Array.isArray(interfacesTMP.out)){
+        if(interfacesTMP.out && Array.isArray(JSON.parse(interfacesTMP.out))){
             console.info(interfacesTMP.out)
             for(const interf of interfacesTMP.out){
                 if(interf.ifname && interf.ifname !== "lo" && interf.ifname.startsWith("vpns")){
