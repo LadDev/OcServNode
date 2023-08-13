@@ -1,6 +1,7 @@
 const UsersOnline = require("../models/UsersOnline");
 const {config} = require('dotenv');
 const mongoose = require("mongoose");
+const Sessions = require("../models/Sessions");
 //const fs = require('fs-extra');
 const DIR = `${__dirname}`.replace("/scripts", "")
 
@@ -59,6 +60,11 @@ config({path: `${DIR}/.env`});
             uo.status = "disconnect"
             uo.disconnectAt = new Date().toISOString()
             await uo.save()
+
+            const sessionDB = await Sessions.findOne({uuid: uo.uuid, uid: uo.uid,userName: uo.userName, session: uo.session, fullSession: uo.fullSession});
+            sessionDB.connected = false
+            sessionDB.closed = new Date().toISOString()
+            await sessionDB.save()
         }
         process.exit(0)
     }

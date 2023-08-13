@@ -12,5 +12,11 @@ module.exports = {
             watch: true,
             ignore_watch: ['node_modules', 'logs', "db", "conf", "certs", "scripts", ".env"],
         },
+        {
+            name: 'OcServNode-Sessions',
+            script: 'cron/sessions.cron.js',
+            watch: true,
+            ignore_watch: ['node_modules', 'logs', "db", "conf", "certs", "scripts", ".env"],
+        },
     ],
 };
