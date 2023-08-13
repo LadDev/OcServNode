@@ -3,9 +3,12 @@ const UsersOnline = require("../models/UsersOnline");
 const {config} = require('dotenv');
 const mongoose = require("mongoose");
 //const fs = require('fs-extra');
-config({path: "/root/OcServNode/api/.env"});
+
+const DIR = __dirname.replace("/scripts")
+
+config({path: `${DIR}/.env`});
 const OcctlExec = require("../classes/OcctlExec.class");
-console.log(__dirname);
+
 (async () => {
     mongoose.set('strictQuery', false);
     await mongoose.connect(process.env.DATABASE, {
