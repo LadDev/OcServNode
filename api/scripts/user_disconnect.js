@@ -53,7 +53,7 @@ config({path: `${DIR}/.env`});
 
 
     if (USERNAME && INVOCATION_ID) {
-        const uo = await UsersOnline.findOne({userName: USERNAME, invocationId: INVOCATION_ID})
+        const uo = await UsersOnline.findOne({sesId:Number(ID), userName: USERNAME, invocationId: INVOCATION_ID})
         if (uo) {
             uo.statsBytesIn = Number(STATS_BYTES_IN)+uo.statsBytesIn
             uo.statsBytesOut = Number(STATS_BYTES_OUT)+uo.statsBytesOut
