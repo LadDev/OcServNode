@@ -5,10 +5,10 @@ const { config } = require('dotenv')
 const fs = require('fs');
 const Nodes = require("./models/Nodes")
 const os = require('os');
-const mongoose = require("mongoose");
 const axios = require("axios");
 const { version } = require('./package.json');
 config()
+const {dbConnect} = require("./db.connector")
 
 function updateEnvVariable(key, value) {
     const envPath = '.env';
@@ -53,10 +53,7 @@ const API_PORT = process.env.API_PORT || 10080
 
 async function start(){
     try{
-        mongoose.set('strictQuery', false);
-        await mongoose.connect(process.env.DATABASE, {
-            useUnifiedTopology: true,
-        })
+        await dbConnect()
 
         //const response = await axios.get('https://ifconfig.me');
 
