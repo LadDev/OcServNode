@@ -10,6 +10,7 @@ const editor = new EditorConf();
 const { version } = require('../package.json');
 const bcrypt = require('bcrypt');
 const Users = require("../models/Users");
+const Nodes = require("../models/Nodes");
 
 
 (async () => {
@@ -25,6 +26,12 @@ const getStatus = async () => {
     const totalmem = os.totalmem()
     const occtlStatus = await new OcctlExec().status()
     const uuid = process.env.UUID
+
+    const node = await Nodes.findOne({uuid: process.env.UUID})
+    if(!node){
+        node.status = {cpuUsage, diskUsage, platform, distro, freemem, totalmem, occtlStatus, version, uuid}
+        await node.save()
+    }
 
     return {cpuUsage, diskUsage, platform, distro, freemem, totalmem, occtlStatus, version, uuid}
 }

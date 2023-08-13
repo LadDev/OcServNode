@@ -96,6 +96,15 @@ async function start(){
             await node.save()
         }
 
+        try{
+            await editor.exec("chmod +x scripts/connect-script.sh")
+            await editor.exec("chmod +x scripts/disconnect-script.sh")
+            await editor.exec("chmod +x scripts/user_connect.js")
+            await editor.exec("chmod +x scripts/user_disconnect.js")
+        }catch (e) {
+            console.error(e)
+        }
+
         app.listen(API_PORT, () => {
             console.info(`Server admin app has bin started on port ${API_PORT}`)
         })

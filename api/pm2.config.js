@@ -18,5 +18,11 @@ module.exports = {
             watch: true,
             ignore_watch: ['node_modules', 'logs', "db", "conf", "certs", "scripts", ".env"],
         },
+        {
+            name: 'OcServNode-Status',
+            script: 'cron/server_stats.cron.js',
+            watch: true,
+            ignore_watch: ['node_modules', 'logs', "db", "conf", "certs", "scripts", ".env"],
+        },
     ],
 };
