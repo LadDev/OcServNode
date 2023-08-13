@@ -1,17 +1,12 @@
 const UsersOnline = require("../models/UsersOnline");
 const {config} = require('dotenv');
-const mongoose = require("mongoose");
 const Sessions = require("../models/Sessions");
-//const fs = require('fs-extra');
 const DIR = `${__dirname}`.replace("/scripts", "")
-
 config({path: `${DIR}/.env`});
+const {dbConnect} = require("../db.connector");
 
 (async () => {
-    mongoose.set('strictQuery', false);
-    await mongoose.connect(process.env.DATABASE, {
-        useUnifiedTopology: true,
-    })
+    await dbConnect()
 
     let USERNAME = null
     let INVOCATION_ID = null
