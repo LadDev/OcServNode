@@ -60,6 +60,8 @@ const Nodes = require("../models/Nodes");
 
             const sessionDB = await Sessions.findOne({uuid: uo.uuid, uid: uo.uid,userName: uo.userName, session: uo.session, fullSession: uo.fullSession});
             sessionDB.connected = false
+            sessionDB.session_is_open = 0
+            sessionDB.in_use = 0
             sessionDB.closed = new Date().toISOString()
             sessionDB.statsBytesIn = Number(STATS_BYTES_IN)
             sessionDB.statsBytesOut = Number(STATS_BYTES_OUT)

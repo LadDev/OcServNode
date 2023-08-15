@@ -40,6 +40,9 @@ EOF
 sudo tee $current_dir/api/.env > /dev/null << EOF
 
 EOF
+npm install --global speedtest-net
+
+speedtest-net --accept-gdpr
 
 npm install -g pm2
 
