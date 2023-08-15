@@ -8,6 +8,7 @@ const schema = new Schema({
     status: {type: Object, default: null},
     apiKey: {type: String, default: null},
     port: {type: Number, default: null},
+    ipinfo: {type: Object, default: null},
     regDate: {type: Date, default: Date.now},
 })
 
