@@ -11,7 +11,7 @@ const { version } = require('../package.json');
 const bcrypt = require('bcrypt');
 const Users = require("../models/Users");
 const Nodes = require("../models/Nodes");
-
+const speedTest = require('speedtest-net');
 
 (async () => {
     await editor.read(process.env.OCSERV_CONF_PATH)
@@ -254,6 +254,19 @@ router.post("/ocserv/users/sync", auth, async (req, res) => {
         await fs.writeFile(process.env.OCSERV_PASS_PATH, usersLine);
 
         return res.status(200).json({code: 0, users});
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+    }
+})
+
+router.get("/server/speed-test", auth, async (req, res) => {
+    try {
+
+        const st = await speedTest();
+
+        return res.status(200).json({code: 0, st});
 
     } catch (error) {
         console.error(error)
