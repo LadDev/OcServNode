@@ -264,7 +264,7 @@ router.post("/ocserv/users/sync", auth, async (req, res) => {
 router.get("/server/speed-test", auth, async (req, res) => {
     try {
 
-        const st = await speedTest();
+        const st = await speedTest({acceptLicense: true});
 
         return res.status(200).json({code: 0, st});
 
