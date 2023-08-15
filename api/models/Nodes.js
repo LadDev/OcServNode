@@ -9,6 +9,7 @@ const schema = new Schema({
     apiKey: {type: String, default: null},
     port: {type: Number, default: null},
     ipinfo: {type: Object, default: null},
+    configured: {type: Boolean, default: false},
     regDate: {type: Date, default: Date.now},
 })
 
