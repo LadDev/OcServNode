@@ -264,7 +264,7 @@ router.post("/ocserv/users/sync", auth, async (req, res) => {
 router.post("/ocserv/users/upload", auth, async (req, res) => {
     try {
 
-        console.log(await fs.readFile(process.env.OCSERV_PASS_PATH))
+        console.log(await fs.readFile(process.env.OCSERV_PASS_PATH, "utf8"))
 
         // const users = await Users.find({});
         // let usersLine = ""
