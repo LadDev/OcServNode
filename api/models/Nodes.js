@@ -10,6 +10,7 @@ const schema = new Schema({
     port: {type: Number, default: null},
     ipinfo: {type: Object, default: null},
     configured: {type: Boolean, default: false},
+    online: {type: Boolean, default: false},
     type: {type: String, default: "ocserv"},
     regDate: {type: Date, default: Date.now},
 })
