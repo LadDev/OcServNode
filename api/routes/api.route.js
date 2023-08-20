@@ -300,7 +300,7 @@ router.post("/ocserv/users/sync", auth, async (req, res) => {
 
         let newUserFile = []
 
-        const usersDB = await Users.find({enabled: true})
+        const usersDB = await Users.find({})
         if(usersDB){
             for(const user of usersDB){
                 newUserFile.push(`${user.username}:${user.group}:${user.hashedPassword}`);
