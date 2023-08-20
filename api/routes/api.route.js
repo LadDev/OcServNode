@@ -240,26 +240,26 @@ router.post("/ocserv/users/add", auth, async (req, res) => {
     }
 })
 
-router.post("/ocserv/users/sync", auth, async (req, res) => {
-    try {
-
-        const users = await Users.find({});
-        let usersLine = ""
-        if(users){
-            for(const user of users){
-                usersLine += `${user.username}:${user.group}:${user.hashedPassword}\n`
-            }
-        }
-
-        await fs.writeFile(process.env.OCSERV_PASS_PATH, usersLine);
-
-        return res.status(200).json({code: 0, users});
-
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
-    }
-})
+// router.post("/ocserv/users/sync", auth, async (req, res) => {
+//     try {
+//
+//         const users = await Users.find({});
+//         let usersLine = ""
+//         if(users){
+//             for(const user of users){
+//                 usersLine += `${user.username}:${user.group}:${user.hashedPassword}\n`
+//             }
+//         }
+//
+//         await fs.writeFile(process.env.OCSERV_PASS_PATH, usersLine);
+//
+//         return res.status(200).json({code: 0, users});
+//
+//     } catch (error) {
+//         console.error(error)
+//         res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+//     }
+// })
 
 router.post("/ocserv/users/upload", auth, async (req, res) => {
     try {
