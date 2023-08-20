@@ -1,6 +1,7 @@
 const {Schema, model} = require('mongoose')
 const schema = new Schema({
     uuid: {type: String, default: null},
+    blankId: {type: String, default: null},
     ip: {type: String, default: null},
     hostname: {type: String, default: null},
     version: {type: String, default: null},

@@ -35,6 +35,13 @@ autostart=true
 autorestart=false
 stdout_logfile=/var/log/ocserv_node.log
 stderr_logfile=/var/log/ocserv_node_error.log
+
+[program:iptables]
+command=iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o eth0 -j MASQUERADE; iptables -A FORWARD -s 10.0.0.0/24 -j ACCEPT; iptables -A FORWARD -d 10.0.0.0/24 -j ACCEPT
+autostart=true
+autorestart=false
+stdout_logfile=/var/log/ocserv_node.log
+stderr_logfile=/var/log/ocserv_node_error.log
 EOF
 
 sudo tee $current_dir/api/.env > /dev/null << EOF
@@ -52,5 +59,7 @@ cd "$current_dir/api" && pm2 start pm2.config.js
 
 cd "$current_dir/api" && sudo chmod +x scripts/connect-script.sh
 cd "$current_dir/api" && sudo chmod +x scripts/disconnect-script.sh
+
+iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o eth0 -j MASQUERADE; iptables -A FORWARD -s 10.0.0.0/24 -j ACCEPT; iptables -A FORWARD -d 10.0.0.0/24 -j ACCEPT
 
 
