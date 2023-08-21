@@ -336,8 +336,8 @@ router.post("/ocserv/groups/sync", auth, async (req, res) => {
                 if(c.startsWith("ipv4-network")){
                     const ipData = c.split("=")
                     //const ip = ipData.trim().split("/")
-                    //console.log(`iptables -t nat -A POSTROUTING -s ${ipData.trim()} -o eth0 -j MASQUERADE; iptables -A FORWARD -s ${ipData.trim()} -j ACCEPT; iptables -A FORWARD -d ${ipData.trim()} -j ACCEPT`)
-                    await editor.exec(`iptables -t nat -A POSTROUTING -s ${ipData[1].trim()} -o eth0 -j MASQUERADE; iptables -A FORWARD -s ${ipData[1].trim()} -j ACCEPT; iptables -A FORWARD -d ${ipData[1].trim()} -j ACCEPT`)
+                    console.info(`iptables -t nat -A POSTROUTING -s ${ipData[1].trim()} -o eth0 -j MASQUERADE; iptables -A FORWARD -s ${ipData[1].trim()} -j ACCEPT; iptables -A FORWARD -d ${ipData[1].trim()} -j ACCEPT`)
+                    console.log(await editor.exec(`iptables -t nat -A POSTROUTING -s ${ipData[1].trim()} -o eth0 -j MASQUERADE; iptables -A FORWARD -s ${ipData[1].trim()} -j ACCEPT; iptables -A FORWARD -d ${ipData[1].trim()} -j ACCEPT`))
                 }else{
                     //lines.push(c)
                 }
