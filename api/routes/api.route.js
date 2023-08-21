@@ -343,6 +343,8 @@ router.post("/ocserv/groups/sync", auth, async (req, res) => {
                     }
                 });
             });
+
+            await editor.exec("service ocserv restart")
         }
 
         return res.status(200).json({code: 200, body: req.body});
