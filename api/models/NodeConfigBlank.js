@@ -8,4 +8,4 @@ const schema = new Schema({
     created: {type: Date, default: Date.now},
 })
 
-module.exports = model('NodeConfigsBlank',schema)
+module.exports = model('NodeConfigBlank',schema)
