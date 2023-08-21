@@ -322,9 +322,28 @@ router.post("/ocserv/users/sync", auth, async (req, res) => {
 router.post("/ocserv/groups/sync", auth, async (req, res) => {
     try {
 
+        const {conf, groupName, forSubscr} = req.body
 
+        const pathToFile = `/var/ocserv/groups/${groupName}`;
 
-        // NodeConfigsBlank
+        if(forSubscr && forSubscr){
+            fss.exists(pathToFile, (exists) => {
+                if (exists) {
+                    console.log('Файл существует, перезаписываем...');
+                } else {
+                    console.log('Файл не существует, создаем и записываем...');
+                }
+
+                // Записываем или перезаписываем файл
+                fss.writeFile(pathToFile, conf, (err) => {
+                    if (err) {
+                        console.error('Ошибка при записи файла:', err);
+                    } else {
+                        console.log('Файл успешно записан/перезаписан!');
+                    }
+                });
+            });
+        }
 
         return res.status(200).json({code: 200, body: req.body});
 
