@@ -6,6 +6,7 @@ config({path: `${DIR}/.env`});
 const {dbConnect} = require("../db.connector");
 const OcctlExec = require("../classes/OcctlExec.class");
 const Nodes = require("../models/Nodes");
+const PurchasedSubscription = require("../models/PurchasedSubscription");
 
 (async () => {
     await dbConnect()
@@ -64,6 +65,21 @@ const Nodes = require("../models/Nodes");
 
         const user = await Users.findOne({username: USERNAME, enabled: true})
         if (user) {
+
+            if(user.client_id){
+                const purchased = await PurchasedSubscription.findOne({client_id: user.client_id, activated: false, expired: false})
+                if(purchased){
+                    const now = new Date();
+                    const twoDaysLater = new Date(now);
+                    twoDaysLater.setDate(now.getDate() + 2);
+                    purchased.activated = true
+                    purchased.startDate = now.toISOString()
+                    purchased.endDate = twoDaysLater.toISOString()
+                    await purchased.save()
+                }
+            }
+
+
             const uo = await UsersOnline.findOne({userName: USERNAME, invocationId: INVOCATION_ID, sesId: null})
             if (uo) {
                 uo.uid = user.id
