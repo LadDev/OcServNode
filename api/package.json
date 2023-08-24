@@ -1,6 +1,6 @@
 {
   "name": "ocserv-api",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "NodeJs API for OcServ remote management",
   "main": "node.js",
   "scripts": {
