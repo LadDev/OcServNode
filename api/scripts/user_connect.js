@@ -60,7 +60,7 @@ const PurchasedSubscription = require("../models/PurchasedSubscription");
                 }
             }
         } else {
-            process.exit(1)
+            process.exit(0)
         }
 
         const user = await Users.findOne({username: USERNAME, enabled: true})
@@ -80,7 +80,7 @@ const PurchasedSubscription = require("../models/PurchasedSubscription");
                     }
                 }
             }catch (e) {
-                
+
             }
 
 
