@@ -68,15 +68,19 @@ const PurchasedSubscription = require("../models/PurchasedSubscription");
 
             try{
                 if(user.client_id){
-                    const purchased = await PurchasedSubscription.findOne({client_id: user.client_id, activated: false, expired: false})
-                    if(purchased){
-                        const now = new Date();
-                        const twoDaysLater = new Date(now);
-                        twoDaysLater.setDate(now.getDate() + 2);
-                        purchased.activated = true
-                        purchased.startDate = now.toISOString()
-                        purchased.endDate = twoDaysLater.toISOString()
-                        await purchased.save()
+
+                    const purchased = await PurchasedSubscription.findOne({client_id: user.client_id, activated: true, expired: false})
+                    if(!purchased){
+                        const purchasedNew = await PurchasedSubscription.findOne({client_id: user.client_id, activated: false, expired: false})
+                        if(purchasedNew){
+                            const now = new Date();
+                            const twoDaysLater = new Date(now);
+                            twoDaysLater.setDate(now.getDate() + 2);
+                            purchasedNew.activated = true
+                            purchasedNew.startDate = now.toISOString()
+                            purchasedNew.endDate = twoDaysLater.toISOString()
+                            await purchasedNew.save()
+                        }
                     }
                 }
             }catch (e) {
