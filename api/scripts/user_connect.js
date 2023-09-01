@@ -75,7 +75,7 @@ const PurchasedSubscription = require("../models/PurchasedSubscription");
                         if(purchasedNew){
                             const now = new Date();
                             const twoDaysLater = new Date(now);
-                            twoDaysLater.setDate(now.getDate() + 2);
+                            twoDaysLater.setDate(now.getDate() + Number(purchasedNew.period));
                             purchasedNew.activated = true
                             purchasedNew.startDate = now.toISOString()
                             purchasedNew.endDate = twoDaysLater.toISOString()
