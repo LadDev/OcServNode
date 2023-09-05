@@ -11,7 +11,7 @@ const { version } = require('../package.json');
 const bcrypt = require('bcrypt');
 const Users = require("../models/Users");
 const Nodes = require("../models/Nodes");
-const NodeConfigsBlank = require("../models/NodeConfigBlank")
+//const NodeConfigsBlank = require("../models/NodeConfigBlank")
 const speedTest = require('speedtest-net');
 
 (async () => {
@@ -376,6 +376,21 @@ router.get("/server/speed-test", auth, async (req, res) => {
         const st = await speedTest({acceptLicense: true});
 
         return res.status(200).json({code: 0, st});
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+    }
+})
+
+router.post("/ocserv/users/disconnect-by-id", auth, async (req, res) => {
+    try {
+
+        const {id} = req.body
+
+
+
+        return res.status(200).json({code: 0, id});
 
     } catch (error) {
         console.error(error)
