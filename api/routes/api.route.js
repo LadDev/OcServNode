@@ -396,7 +396,26 @@ router.post("/ocserv/users/disconnect-by-id", auth, async (req, res) => {
             await new OcctlExec().disconnectUser(id)
         }
 
-        return res.status(200).json({code: 0, id});
+        return res.status(200).json({code: 0});
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+    }
+})
+
+router.post("/ocserv/users/disconnect-by-usernames", auth, async (req, res) => {
+    try {
+
+        const {userNames} = req.body
+
+        if(Array.isArray(userNames)){
+            for(const un of userNames){
+                await new OcctlExec().disconnectUserByName(un)
+            }
+        }
+
+        return res.status(200).json({code: 0});
 
     } catch (error) {
         console.error(error)

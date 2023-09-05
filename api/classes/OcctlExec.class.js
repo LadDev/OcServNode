@@ -108,6 +108,14 @@ class OcctlExec {
         });
     }
 
+    async disconnectUserByName(name){
+        return new Promise((resolve) => {
+            exec(`occtl --json disconnect user ${name}`, async () => {
+                resolve({})
+            });
+        });
+    }
+
     async sessions(type = "all"){
         return new Promise((resolve) => {
             exec('occtl --json show sessions '+type, async (error, stdout) => {
