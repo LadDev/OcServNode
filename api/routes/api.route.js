@@ -388,7 +388,13 @@ router.post("/ocserv/users/disconnect-by-id", auth, async (req, res) => {
 
         const {id} = req.body
 
-
+        if(Array.isArray(id)){
+            for(const i of id){
+                await new OcctlExec().disconnectUser(i)
+            }
+        }else{
+            await new OcctlExec().disconnectUser(id)
+        }
 
         return res.status(200).json({code: 0, id});
 

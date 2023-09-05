@@ -102,7 +102,7 @@ class OcctlExec {
 
     async disconnectUser(id){
         return new Promise((resolve) => {
-            exec('occtl --json disconnect id '+id, async () => {
+            exec(`occtl --json disconnect id ${id}`, async () => {
                 resolve({})
             });
         });
