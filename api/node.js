@@ -2,34 +2,15 @@ const express = require('express');
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const { config } = require('dotenv')
-const fs = require('fs');
-const Nodes = require("./models/Nodes")
-const os = require('os');
-const axios = require("axios");
-const { version } = require('./package.json');
 config()
 const {dbConnect} = require("./db.connector")
 const EditorConf = require("./classes/editor.conf");
-const OcctlExec = require("./classes/OcctlExec.class");
 const editor = new EditorConf();
 const YAML = require("yamljs");
 const swaggerUi = require('swagger-ui-express')
+const {updateEnvVariable, getStatusData, updateOrInsertNode, setScriptPermissions} = require("./utils");
 
-function updateEnvVariable(key, value) {
-    const envPath = '.env';
-    let envContent = fs.readFileSync(envPath, 'utf8');
 
-    const regex = new RegExp(`^(${key}=)(.*)$`, 'm');
-    if (envContent.match(regex)) {
-        // Если ключ уже существует, обновляем его
-        envContent = envContent.replace(regex, `$1${value}`);
-    } else {
-        // Если ключа нет, добавляем его в конец файла
-        envContent += `\n${key}=${value}\n`;
-    }
-
-    fs.writeFileSync(envPath, envContent);
-}
 
 if(!process.env.UUID){
     const { v4: uuidv4 } = require('uuid');
@@ -60,88 +41,33 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 const API_PORT = process.env.API_PORT || 10080
 
-async function start(){
-    try{
-        await dbConnect()
+async function start() {
+    try {
+        await dbConnect();
 
-        let interfaces = []
+        let interfaces = [];
 
-        try{
-            const interfacesTMP = await editor.exec("ip -j -s addr | jq")
-            if(interfacesTMP.out){
-                const interfacesJSON = JSON.parse(interfacesTMP.out)
-                for(const interf of interfacesJSON){
-                    if(interf.ifname && interf.ifname !== "lo" && !interf.ifname.startsWith("vpns")){
-                        interfaces.push(interf)
-                    }
-                }
+        try {
+            const interfacesTMP = await editor.exec("ip -j -s addr | jq");
+            if (interfacesTMP.out) {
+                const interfacesJSON = JSON.parse(interfacesTMP.out);
+                interfaces = interfacesJSON.filter(interf => interf.ifname && interf.ifname !== "lo" && !interf.ifname.startsWith("vpns"));
             }
-        }catch (e) {
-            console.error(e)
+        } catch (e) {
+            console.error(e);
         }
 
-        let status = null
+        const status = await getStatusData();
 
-        try{
-            const cpuUsage = await editor.getCpuUsage();
-            const diskUsage = await editor.getDiskUsage();
-            const platform = os.platform()
-            const distro = await editor.getLinuxDistro()
-            const freemem = os.freemem()
-            const totalmem = os.totalmem()
-            let occtlStatus = await new OcctlExec().status()
-            if(occtlStatus === {}) occtlStatus = null;
-            const uuid = process.env.UUID
-
-            status = {cpuUsage, diskUsage, platform, distro, freemem, totalmem, occtlStatus, version, uuid}
-        }catch (e) {
-            console.error(e)
-        }
-
-        const node = await Nodes.findOne({uuid: process.env.UUID})
-        if(!node){
-            const response = await axios.get('https://ifconfig.me');
-
-            const newNode = new Nodes({
-                uuid: process.env.UUID,
-                ip: response.data,
-                hostname: os.hostname(),
-                interfaces,
-                status,
-                version,
-                apiKey: process.env.API_KEY,
-                port: process.env.API_PORT || 10080
-            })
-            await newNode.save()
-            updateEnvVariable("GLOBAL_IP", response.data)
-            config()
-        }else{
-            const response = await axios.get('https://ifconfig.me');
-            node.hostname = os.hostname()
-            node.ip = response.data
-            node.version = version
-            node.interfaces = interfaces
-            node.status = status
-            node.apiKey = process.env.API_KEY
-            node.port = process.env.API_PORT || 10080
-            await node.save()
-        }
-
-        try{
-            await editor.exec("chmod +x scripts/connect-script.sh")
-            await editor.exec("chmod +x scripts/disconnect-script.sh")
-            await editor.exec("chmod +x scripts/user_connect.js")
-            await editor.exec("chmod +x scripts/user_disconnect.js")
-        }catch (e) {
-            console.error(e)
-        }
+        await updateOrInsertNode(interfaces, status);
+        await setScriptPermissions();
 
         app.listen(API_PORT, () => {
-            console.info(`Server admin app has bin started on port ${API_PORT}`)
-        })
-    }catch (e){
-        console.error("Server Error:", e.message)
-        process.exit(0)
+            console.info(`Server admin app has been started on port ${API_PORT}`);
+        });
+    } catch (e) {
+        console.error("Server Error:", e.message);
+        process.exit(0);
     }
 }
 
