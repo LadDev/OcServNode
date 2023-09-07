@@ -1,8 +1,8 @@
-import os from "os";
+const os  = require("os");
 const { version } = require('./package.json');
-import OcctlExec from "./classes/OcctlExec.class";
-import Nodes from "./models/Nodes";
-import EditorConf from "./classes/editor.conf";
+const OcctlExec = require("./classes/OcctlExec.class");
+const Nodes = require("./models/Nodes");
+const EditorConf = require("./classes/editor.conf");
 const editor = new EditorConf();
 
 const getStatus = async () => {
