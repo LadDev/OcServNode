@@ -108,4 +108,3 @@ config({ path: `${DIR}/.env` });
     }
     process.exit(1);
 })();
-
