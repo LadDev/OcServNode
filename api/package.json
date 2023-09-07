@@ -1,6 +1,6 @@
 {
   "name": "ocserv-api",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "NodeJs API for OcServ remote management",
   "main": "node.js",
   "scripts": {
@@ -45,7 +45,10 @@
     "os-utils": "^0.0.14",
     "ping": "^0.4.4",
     "prettier": "^3.0.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "uuid": "^9.0.0",
-    "speedtest-net": "^2.2.0"
+    "speedtest-net": "^2.2.0",
+    "yamljs": "^0.3.0"
   }
 }

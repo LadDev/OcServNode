@@ -1,0 +1,120 @@
+openapi: "3.0.0"
+info:
+  version: "0.0.4"
+  title: "OcServ VPN Node API"
+  description: "OcServ Node Api is an API to fully manage OcServ remotely. This API is connected to the main pool database, after which the server is fully configured from the pool administration panel."
+  contact:
+    name: "LadDev"
+    email: "laddev.site@inbox.lv"
+  license:
+    name: "© LadDev. All rights reserved"
+externalDocs:
+    description: "GitHub repository"
+    url: "https://github.com/LadDev/OcServNode"
+servers:
+  - url: "http://localhost:10080"
+
+paths:
+  /api/system/status:
+    get:
+      tags:
+        - Node Main API
+      summary: When a request is received, the system collects complete information about the system status
+      x-order: 0
+      responses:
+        200:
+          description: This query returns complete system status information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    description: Code indicating no error or error presence
+                  status:
+                    type: object
+                    description: Object containing complete information about the system
+                    properties:
+                      cpuUsage:
+                        type: number
+                        description: A numeric value containing information about CPU utilization in percent
+                      diskUsage:
+                        type: number
+                        description: A numeric value containing information about Disk utilization in percent
+                      platform:
+                        type: string
+                        description: String value containing information about the type of platform the script is running on (linux, windows, macos, etc...)
+                      distro:
+                        type: object
+                        description: Object containing information about the operating system build
+                      freemem:
+                        type: number
+                        description: Information about free RAM
+                      totalmem:
+                        type: number
+                        description: Information about total RAM
+                      occtlStatus:
+                        type: object
+                        description: Information about ocserv status
+                      version:
+                        type: string
+                        description: API version information
+                      uuid:
+                        type: string
+                        description: Identifier of the node in the shared pool
+        500:
+          description: If an error occurs, code 500 is returned
+
+  /api/system/status/interfaces:
+    get:
+      tags:
+        - Node Main API
+      summary: Request full information about the status of the network interfaces
+      x-order: 0
+      responses:
+        200:
+          description: Returns a list of network interfaces containing a complete list of interfaces and their operational properties
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    description: Code indicating no error or error presence
+                  interfaces:
+                    type: array
+                    description: An array of interface objects. Each object contains detailed information about the interface
+        500:
+          description: If an error occurs, code 500 is returned
+
+  /api/git-update:
+    get:
+      tags:
+        - Node Main API
+      summary: This request updates the API script from the Git repository
+      x-order: 2
+      responses:
+        200:
+          description: Successful execution of the request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    description: Code indicating no error or error presence
+        500:
+          description: If an error occurs, code 500 is returned
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      name: Authorization
+      in: header
+      description: Авторизация по токену сгенерированному при инициализации клиента

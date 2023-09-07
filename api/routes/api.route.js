@@ -2,41 +2,18 @@ const {Router} = require("express")
 const router = Router()
 const EditorConf = require("../classes/editor.conf");
 const auth = require("../middleware/auth.middleware");
-const fs = require("fs-extra");
-const fss = require("fs");
-const os = require("os");
+const fsp = require('fs').promises;
 const OcctlExec = require("../classes/OcctlExec.class");
 const editor = new EditorConf();
-const { version } = require('../package.json');
 const bcrypt = require('bcrypt');
 const Users = require("../models/Users");
-const Nodes = require("../models/Nodes");
-//const NodeConfigsBlank = require("../models/NodeConfigBlank")
 const speedTest = require('speedtest-net');
+const {getStatus} = require("../utils");
+const CERTS_PATH = "/var/certs/";
 
 (async () => {
     await editor.read(process.env.OCSERV_CONF_PATH)
 })();
-
-const getStatus = async () => {
-    const cpuUsage = await editor.getCpuUsage();
-    const diskUsage = await editor.getDiskUsage();
-    const platform = os.platform()
-    const distro = await editor.getLinuxDistro()
-    const freemem = os.freemem()
-    const totalmem = os.totalmem()
-    let occtlStatus = await new OcctlExec().status()
-    if(occtlStatus === {}) occtlStatus = null;
-    const uuid = process.env.UUID
-
-    const node = await Nodes.findOne({uuid: process.env.UUID})
-    if(!node){
-        node.status = {cpuUsage, diskUsage, platform, distro, freemem, totalmem, occtlStatus, version, uuid}
-        await node.save()
-    }
-
-    return {cpuUsage, diskUsage, platform, distro, freemem, totalmem, occtlStatus, version, uuid}
-}
 
 router.get("/system/status", auth, async (req, res) => {
     try {
@@ -49,25 +26,32 @@ router.get("/system/status", auth, async (req, res) => {
 
 router.get("/system/status/interfaces", auth, async (req, res) => {
     try {
+        const { out } = await editor.exec("ip -j -s addr | jq");
 
-        const interfacesTMP = await editor.exec("ip -j -s addr | jq")
-        let interfaces = []
-
-        if(interfacesTMP.out){
-            const interfacesJSON = JSON.parse(interfacesTMP.out)
-            for(const interf of interfacesJSON){
-                if(interf.ifname && interf.ifname !== "lo" && !interf.ifname.startsWith("vpns")){
-                    interfaces.push(interf)
-                }
-            }
+        if (!out) {
+            return res.status(500).json({ code: -1, message: "Failed to retrieve interface data." });
         }
 
-        res.status(200).json({code: 0, interfaces})
+        let interfacesJSON;
+        try {
+            interfacesJSON = JSON.parse(out);
+        } catch (error) {
+            console.error("Error while parsing JSON:", error);
+            return res.status(500).json({ code: -1, message: "Error in processing interface data." });
+        }
+
+        const interfaces = interfacesJSON.filter(interf =>
+            interf.ifname &&
+            interf.ifname !== "lo" &&
+            !interf.ifname.startsWith("vpns")
+        );
+
+        res.status(200).json({ code: 0, interfaces });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+        console.error(error);
+        res.status(500).json({ code: -1, message: "Something went wrong, please try again." });
     }
-})
+});
 
 router.get("/git-update", auth, async (req, res) => {
     try {
@@ -109,98 +93,116 @@ router.post("/configs/create", auth, async (req, res) => {
 
 router.post("/system/command/:command", auth, async (req, res) => {
     try {
-        const {command} = req.params
-        let mess = ""
-        if (command) {
-            if (command === "start" || command === "restart") {
-                const {out} = await editor.exec(`service ocserv ${command}`)
-                mess = out
-            } else if (command === "stop") {
-                const {out} = await editor.exec(`occtl stop now`)
-                mess = out
-                await editor.exec(`service ocserv stop`)
-            } else if (command === "reload" || command === "reset") {
-                const {out} = await editor.exec(`occtl ${command}`)
-                mess = out
+        const { command } = req.params;
+        let mess = "";
+
+        const commandMappings = {
+            "start": "service ocserv start",
+            "restart": "service ocserv restart",
+            "stop": ["occtl stop now", "service ocserv stop"],
+            "reload": "occtl reload",
+            "reset": "occtl reset"
+        };
+
+        if (commandMappings[command]) {
+            if (Array.isArray(commandMappings[command])) {
+                for (const cmd of commandMappings[command]) {
+                    const { out } = await editor.exec(cmd);
+                    mess += out;
+                }
+            } else {
+                const { out } = await editor.exec(commandMappings[command]);
+                mess = out;
             }
+        } else {
+            throw new Error(`Invalid command: ${command}`);
         }
-        res.status(200).json({code: 0, message: mess, status: await getStatus()})
+
+        res.status(200).json({ code: 0, message: mess, status: await getStatus() });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+        console.error(error);
+        res.status(500).json({ code: -1, message: "Something went wrong, please try again" });
     }
-})
+});
 
 router.post("/configs/cerificates", auth, async (req, res) => {
     try {
+        const { privkey, ca_bundle, certificate, fullchain } = req.body;
 
-        const {privkey, ca_bundle, certificate, fullchain} = req.body
-        await editor.exec("service ocserv stop")
+        await editor.exec("service ocserv stop");
+
+        // Creating directory, ignore error if directory already exists
         try {
-            await editor.exec("mkdir -p /var/certs")
+            await editor.exec(`mkdir -p ${CERTS_PATH}`);
         } catch (e) {
-            console.error(e)
+            console.error(e);
         }
 
+        let fullchainString = "";
+
+        // Validate and handle certificate data
         if (fullchain && privkey) {
-            const privkeyString = Buffer.from(privkey, 'base64').toString('utf8');
-            const fullchainString = Buffer.from(fullchain, 'base64').toString('utf8');
-            try {
-                await fs.writeFile("/var/certs/privkey.pem", privkeyString);
-                await fs.writeFile("/var/certs/fullchain.pem", fullchainString);
-            } catch (e) {
-                console.error(e)
-                return res.status(500).json({code: -1, message: "Error in Certs Data"})
-            }
+            fullchainString = Buffer.from(fullchain, 'base64').toString('utf8');
         } else if (ca_bundle && certificate && privkey) {
-            const privkeyString = Buffer.from(privkey, 'base64').toString('utf8');
             const ca_bundleString = Buffer.from(ca_bundle, 'base64').toString('utf8');
             const certificateString = Buffer.from(certificate, 'base64').toString('utf8');
-            try {
-                const fullchain_new = `${certificateString}${ca_bundleString}`
-                await fs.writeFile("/var/certs/privkey.pem", privkeyString);
-                await fs.writeFile("/var/certs/fullchain.pem", fullchain_new);
-            } catch (e) {
-                console.error(e)
-                return res.status(500).json({code: -1, message: "Error in Certs Data"})
-            }
+            fullchainString = `${certificateString}${ca_bundleString}`;
         } else {
-            return res.status(500).json({code: -1, message: "Error in Certs Data"})
+            return res.status(500).json({ code: -1, message: "Error in Certs Data" });
         }
 
-        await editor.setParam("server-cert", "/var/certs/fullchain.pem")
-        await editor.setParam("server-key", "/var/certs/privkey.pem")
+        const privkeyString = Buffer.from(privkey, 'base64').toString('utf8');
 
+        try {
+            await fsp.writeFile(`${CERTS_PATH}privkey.pem`, privkeyString);
+            await fsp.writeFile(`${CERTS_PATH}fullchain.pem`, fullchainString);
+        } catch (e) {
+            console.error(e);
+            return res.status(500).json({ code: -1, message: "Error in Certs Data" });
+        }
 
-        await editor.exec("service ocserv start")
+        await editor.setParam("server-cert", `${CERTS_PATH}fullchain.pem`);
+        await editor.setParam("server-key", `${CERTS_PATH}privkey.pem`);
 
-        res.status(200).json({code: 0, params: editor.params})
+        await editor.exec("service ocserv start");
+
+        res.status(200).json({ code: 0, params: editor.params });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+        console.error(error);
+        res.status(500).json({ code: -1, message: "Something went wrong, please try again" });
     }
-})
+});
 
 router.post("/exec/:script", auth, async (req, res) => {
     try {
+        const { script } = req.params;
+        const { scriptBody, command } = req.body;
 
-        const {script} = req.params
-        const {scriptBody, command} = req.body
+        // Some basic input validation. This can be expanded.
+        if (typeof script !== 'string' || script.includes("..") || script.includes("/") || typeof scriptBody !== 'string' || typeof command !== 'string') {
+            return res.status(200).json({ code: 400, message: "Invalid input." });
+        }
 
-
+        // Decode the scriptBody
         let scriptBodyDecoded = Buffer.from(scriptBody, 'base64').toString('utf8');
 
-        await fs.writeFile(`./scripts/${script}`, scriptBodyDecoded);
+        // Write the decoded script to a file
+        await fsp.writeFile(`./scripts/${script}`, scriptBodyDecoded);
 
-        await editor.exec(`chmod +x ./scripts/${script}`)
-        await editor.exec(command)
+        // Make the script executable
+        await editor.exec(`chmod +x ./scripts/${script}`);
 
-        res.status(200).json({code: 0, params: editor.params || {}})
+        // You should be VERY careful about this. Ideally, this should not be done.
+        // It is highly recommended to not execute a command directly from user input.
+        // If you must, ensure that command is rigorously validated.
+        await editor.exec(command);
+
+        res.status(200).json({ code: 0, params: editor.params || {} });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+        console.error(error);
+        res.status(500).json({ code: -1, message: "Something went wrong, please try again" });
     }
-})
+});
 
 /**
  * USERS ROUTES
@@ -208,167 +210,133 @@ router.post("/exec/:script", auth, async (req, res) => {
 
 router.post("/ocserv/users/add", auth, async (req, res) => {
     try {
+        const { username, password, group, client_id } = req.body;
 
-        const {username, password, group, client_id} = req.body
-        const saltRounds = 10;
-        const salt = bcrypt.genSaltSync(saltRounds);
-        const hashedPassword = bcrypt.hashSync(password, salt);
+        const existingUser = await Users.findOne({ username });
 
-        const user = await Users.findOne({username,password})
-        if(!user){
+        if (!existingUser) {
+            const hashedPassword = await bcrypt.hash(password, 10);
             const newUser = new Users({
                 client_id: client_id || null,
                 username,
                 password,
                 hashedPassword,
-                group
-            })
+                group: group || "*"
+            });
 
-            await newUser.save()
+            await newUser.save();
+
+            const userEntry = `${username}:${group || "*"}:${hashedPassword}\n`;
+            await fsp.appendFile(process.env.OCSERV_PASS_PATH, userEntry);
         }
 
-        const userEntry = `${username}:${group || "*"}:${hashedPassword}\n`;
+        const users = await new OcctlExec().users();
+        const usersFile = await fsp.readFile(process.env.OCSERV_PASS_PATH, 'utf8');
 
-        fss.appendFileSync(process.env.OCSERV_PASS_PATH, userEntry);
-
-        const users = await new OcctlExec().users()
-        const usersFile = fss.readFileSync(process.env.OCSERV_PASS_PATH, 'utf8').split("\n")
-        return res.status(200).json({code: 0, users,usersFile});
+        return res.status(200).json({ code: 0, users, usersFile: usersFile.split("\n") });
 
     } catch (error) {
-        console.error(error)
-        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+        console.error(error);
+        res.status(500).json({ code: -1, message: "Something went wrong, please try again" });
     }
-})
-
-// router.post("/ocserv/users/sync", auth, async (req, res) => {
-//     try {
-//
-//         const users = await Users.find({});
-//         let usersLine = ""
-//         if(users){
-//             for(const user of users){
-//                 usersLine += `${user.username}:${user.group}:${user.hashedPassword}\n`
-//             }
-//         }
-//
-//         await fs.writeFile(process.env.OCSERV_PASS_PATH, usersLine);
-//
-//         return res.status(200).json({code: 0, users});
-//
-//     } catch (error) {
-//         console.error(error)
-//         res.status(500).json({code: -1, message: "Something went wrong, please try again"})
-//     }
-// })
+});
 
 router.post("/ocserv/users/upload", auth, async (req, res) => {
     try {
 
-        const lines = await fs.readFile(process.env.OCSERV_PASS_PATH, "utf8")
-        const linesArray = lines.split("\n")
-        if(linesArray && linesArray.length>0){
-            for(const u of linesArray){
-                const userArray = u.split(":")
-                if(u !== "" && userArray.length >1){
-                    const user = await Users.findOne({username: userArray[0],hashedPassword: userArray[2]})
-                    if(!user){
-                        const newUser = new Users({
-                            client_id: null,
-                            username: userArray[0],
-                            password:"undefined",
-                            hashedPassword: userArray[2],
-                            enabled: true,
-                            group: userArray[1]
-                        })
+        const lines = await fsp.readFile(process.env.OCSERV_PASS_PATH, "utf8");
+        const linesArray = lines.split("\n");
 
-                        await newUser.save()
-                    }
+        const promises = linesArray.map(async (line) => {
+            const [username, group, hashedPassword] = line.split(":");
+
+            // Ensure that the line has valid user details.
+            if (username && group && hashedPassword) {
+                const user = await Users.findOne({ username, hashedPassword });
+
+                if (!user) {
+                    const newUser = new Users({
+                        client_id: null,
+                        username,
+                        password: "undefined",
+                        hashedPassword,
+                        enabled: true,
+                        group
+                    });
+
+                    return newUser.save();
                 }
             }
-        }
+        });
 
-        return res.status(200).json({code: 200});
+        // Wait for all promises to finish
+        await Promise.all(promises);
+
+        return res.status(200).json({ code: 200 });
 
     } catch (error) {
-        console.error(error)
-        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+        console.error(error);
+        res.status(500).json({ code: -1, message: "Something went wrong, please try again" });
     }
-})
+});
 
 router.post("/ocserv/users/sync", auth, async (req, res) => {
     try {
 
-        let newUserFile = []
+        const usersDB = await Users.find({});
 
-        const usersDB = await Users.find({})
-        if(usersDB){
-            for(const user of usersDB){
-                newUserFile.push(`${user.username}:${user.group}:${user.hashedPassword}`);
-            }
-        }
+        const newUserFile = usersDB.map(user => `${user.username}:${user.group}:${user.hashedPassword}`);
 
-        const lines = newUserFile.join("\n")
-        await fs.writeFile(process.env.OCSERV_PASS_PATH, lines);
+        await fsp.writeFile(process.env.OCSERV_PASS_PATH, newUserFile.join("\n"));
 
         return res.status(200).json({code: 200});
 
     } catch (error) {
-        console.error(error)
-        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+        console.error(error);
+        res.status(500).json({code: -1, message: "Something went wrong, please try again"});
     }
-})
+});
 
 router.post("/ocserv/groups/sync", auth, async (req, res) => {
-    try {
 
-        const {conf, groupName, forSubscr} = req.body
+    try {
+        const { conf, groupName, forSubscr } = req.body;
 
         const pathToFile = `/var/ocserv/groups/${groupName}`;
 
-        if(forSubscr && forSubscr){
+        if (forSubscr) {
+            const confArray = conf.split("\n");
 
-            //let lines = []
-
-            const confArray = conf.split("\n")
-
-            for(const c of confArray){
-                if(c.startsWith("ipv4-network")){
-                    const ipData = c.split("=")
-                    //const ip = ipData.trim().split("/")
-                    await editor.exec(`iptables -t nat -A POSTROUTING -s ${ipData[1].trim()} -o eth0 -j MASQUERADE; iptables -A FORWARD -s ${ipData[1].trim()} -j ACCEPT; iptables -A FORWARD -d ${ipData[1].trim()} -j ACCEPT`)
-                }else{
-                    //lines.push(c)
+            for (const c of confArray) {
+                if (c.startsWith("ipv4-network")) {
+                    const ipData = c.split("=");
+                    await editor.exec(`iptables -t nat -A POSTROUTING -s ${ipData[1].trim()} -o eth0 -j MASQUERADE; iptables -A FORWARD -s ${ipData[1].trim()} -j ACCEPT; iptables -A FORWARD -d ${ipData[1].trim()} -j ACCEPT`);
                 }
             }
 
-            fss.exists(pathToFile, (exists) => {
-                if (exists) {
-                    console.log('Файл существует, перезаписываем...');
-                } else {
-                    console.log('Файл не существует, создаем и записываем...');
-                }
+            try {
+                await fsp.access(pathToFile);
+                console.log('Файл существует, перезаписываем...');
+            } catch (error) {
+                console.log('Файл не существует, создаем и записываем...');
+            }
 
-                // Записываем или перезаписываем файл
-                fss.writeFile(pathToFile, conf, (err) => {
-                    if (err) {
-                        console.error('Ошибка при записи файла:', err);
-                    } else {
-                        console.log('Файл успешно записан/перезаписан!');
-                    }
-                });
-            });
+            try {
+                await fsp.writeFile(pathToFile, conf);
+                console.log('Файл успешно записан/перезаписан!');
+            } catch (error) {
+                console.error('Ошибка при записи файла:', error);
+            }
 
-            await editor.exec("service ocserv restart")
+            await editor.exec("service ocserv restart");
         }
 
         return res.status(200).json({code: 200});
-
     } catch (error) {
-        console.error(error)
-        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+        console.error(error);
+        res.status(500).json({code: -1, message: "Something went wrong, please try again"});
     }
-})
+});
 
 router.get("/server/speed-test", auth, async (req, res) => {
     try {
@@ -385,42 +353,31 @@ router.get("/server/speed-test", auth, async (req, res) => {
 
 router.post("/ocserv/users/disconnect-by-id", auth, async (req, res) => {
     try {
+        const {id} = req.body;
+        const ids = Array.isArray(id) ? id : [id];  // Гарантируем, что ids является массивом.
 
-        const {id} = req.body
-
-        if(Array.isArray(id)){
-            for(const i of id){
-                await new OcctlExec().disconnectUser(i)
-            }
-        }else{
-            await new OcctlExec().disconnectUser(id)
-        }
+        const disconnectPromises = ids.map(i => new OcctlExec().disconnectUser(i));
+        await Promise.all(disconnectPromises);
 
         return res.status(200).json({code: 0});
-
     } catch (error) {
-        console.error(error)
-        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+        console.error(error);
+        res.status(500).json({code: -1, message: "Something went wrong, please try again"});
     }
-})
+});
 
 router.post("/ocserv/users/disconnect-by-usernames", auth, async (req, res) => {
     try {
+        const {userNames = []} = req.body;
 
-        const {userNames} = req.body
-
-        if(Array.isArray(userNames)){
-            for(const un of userNames){
-                await new OcctlExec().disconnectUserByName(un)
-            }
-        }
+        const disconnectPromises = userNames.map(un => new OcctlExec().disconnectUserByName(un));
+        await Promise.all(disconnectPromises);
 
         return res.status(200).json({code: 0});
-
     } catch (error) {
-        console.error(error)
-        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+        console.error(error);
+        res.status(500).json({code: -1, message: "Something went wrong, please try again"});
     }
-})
+});
 
 module.exports = router

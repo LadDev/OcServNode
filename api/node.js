@@ -12,6 +12,8 @@ const {dbConnect} = require("./db.connector")
 const EditorConf = require("./classes/editor.conf");
 const OcctlExec = require("./classes/OcctlExec.class");
 const editor = new EditorConf();
+const YAML = require("yamljs");
+const swaggerUi = require('swagger-ui-express')
 
 function updateEnvVariable(key, value) {
     const envPath = '.env';
@@ -50,6 +52,10 @@ app.use(function (req, res, next) {
 })
 
 app.use("/api", require("./routes/api.route"))
+
+
+const swaggerDocument = YAML.load("./swagger.yaml");
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 
 const API_PORT = process.env.API_PORT || 10080
