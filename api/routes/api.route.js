@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt');
 const Users = require("../models/Users");
 const speedTest = require('speedtest-net');
 const {getStatus} = require("../utils");
+const fs = require("fs-extra");
 const CERTS_PATH = "/var/certs/";
 
 (async () => {
@@ -72,7 +73,10 @@ router.get("/configs", auth, async (req, res) => {
     try {
         let params = {...editor.params}
         delete params.commented
-        res.status(200).json({code: 0, params})
+
+        const confText = await fs.readFile(process.env.OCSERV_CONF_PATH, 'utf8')
+
+        res.status(200).json({code: 0, params,confText})
     } catch (error) {
         console.error(error)
         res.status(500).json({code: -1, message: "Something went wrong, please try again"})
