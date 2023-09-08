@@ -85,17 +85,11 @@ router.get("/configs", auth, async (req, res) => {
 
 router.post("/configs", auth, async (req, res) => {
     try {
-
         const {conf,type} = req.body
-
-        console.info("Save Config", req.body)
-
         if(conf && type && type === "plain/text"){
-
             await fs.writeFile(process.env.OCSERV_CONF_PATH, conf, 'utf-8');
             await editor.exec("service ocserv restart")
         }
-
 
         await editor.read(process.env.OCSERV_CONF_PATH)
         let params = {...editor.params}
