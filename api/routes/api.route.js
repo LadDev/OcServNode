@@ -104,6 +104,19 @@ router.post("/configs", auth, async (req, res) => {
     }
 })
 
+router.post("/certs", auth, async (req, res) => {
+    try {
+
+        const privkey = await fs.readFile(`${CERTS_PATH}privkey.pem`, 'utf8')
+        const fullchain = await fs.readFile(`${CERTS_PATH}fullchain.pem`, 'utf8')
+
+        res.status(200).json({code: 0, certs: {privkey,fullchain}})
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+    }
+})
+
 router.post("/configs/create", auth, async (req, res) => {
     try {
         const {config} = req.body
