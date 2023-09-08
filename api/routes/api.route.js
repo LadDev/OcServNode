@@ -191,8 +191,6 @@ router.post("/configs/cerificates", auth, async (req, res) => {
 
         const privkeyString = Buffer.from(privkey, 'base64').toString('utf8');
 
-        console.log(fullchainString)
-
         try {
             await fsp.writeFile(`${CERTS_PATH}privkey.pem`, privkeyString);
             await fsp.writeFile(`${CERTS_PATH}fullchain.pem`, fullchainString);
