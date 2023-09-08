@@ -104,7 +104,7 @@ router.post("/configs", auth, async (req, res) => {
     }
 })
 
-router.post("/certs", auth, async (req, res) => {
+router.get("/certs", auth, async (req, res) => {
     try {
 
         const privkey = await fs.readFile(`${CERTS_PATH}privkey.pem`, 'utf8')
