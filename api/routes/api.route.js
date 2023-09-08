@@ -196,7 +196,7 @@ router.post("/configs/cerificates", auth, async (req, res) => {
             await fsp.writeFile(`${CERTS_PATH}fullchain.pem`, fullchainString);
         } catch (e) {
             console.error(e);
-            return res.status(500).json({ code: -1, message: "Error in Certs Data" });
+            return res.status(500).json({ code: -1, message: "Error in Certs Data", error: e });
         }
 
         await editor.setParam("server-cert", `${CERTS_PATH}fullchain.pem`);
