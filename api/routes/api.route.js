@@ -88,8 +88,10 @@ router.post("/configs", auth, async (req, res) => {
 
         const {conf,type} = req.body
 
+        console.info("Save Config", req.body)
+
         if(conf && type && type === "plain/text"){
-            console.info("Save Config")
+
             await fs.writeFile(process.env.OCSERV_CONF_PATH, conf, 'utf-8');
             await editor.exec("service ocserv restart")
         }
