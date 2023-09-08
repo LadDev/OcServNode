@@ -83,6 +83,30 @@ router.get("/configs", auth, async (req, res) => {
     }
 })
 
+router.post("/configs", auth, async (req, res) => {
+    try {
+
+        const {conf,type} = req.body
+
+        if(conf && type && type === "plain/text"){
+            await fs.writeFile(process.env.OCSERV_CONF_PATH, conf, 'utf-8');
+            await editor.exec("service ocserv restart")
+        }
+
+
+        await editor.read(process.env.OCSERV_CONF_PATH)
+        let params = {...editor.params}
+        delete params.commented
+
+        const confText = await fs.readFile(process.env.OCSERV_CONF_PATH, 'utf8')
+
+        res.status(200).json({code: 0, params,confText})
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({code: -1, message: "Something went wrong, please try again"})
+    }
+})
+
 router.post("/configs/create", auth, async (req, res) => {
     try {
         const {config} = req.body
