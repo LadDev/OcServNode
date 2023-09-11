@@ -59,6 +59,7 @@ async function start() {
 
         const status = await getStatusData();
 
+
         await updateOrInsertNode(interfaces, status);
         await setScriptPermissions();
 
