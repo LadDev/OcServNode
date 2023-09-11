@@ -11,6 +11,26 @@ const Subscriptions = require("../models/Subscriptions");
 const Clients = require("../models/Clients");
 const mongoose = require("mongoose");
 const {Types} = require("mongoose");
+const axios = require("axios");
+
+const syncUsers = async () => {
+    const nodes = await Nodes.find({})
+    if(nodes){
+        for(const node of nodes){
+            try{
+                const url = `http://${node.ip}:${node.port}/api/ocserv/users/sync`
+
+                await axios.post(url, null, {
+                    headers: {
+                        'Authorization': `Bearer ${node.apiKey}`
+                    }
+                });
+            }catch (e) {
+                console.error(e)
+            }
+        }
+    }
+}
 
 (async () => {
     await dbConnect()
@@ -98,6 +118,7 @@ const {Types} = require("mongoose");
                                         await Users.updateMany({client_id: new Types.ObjectId(client.id)}, {$set: {group: findSubscr.group}})
                                     }
                                 }
+                                await syncUsers()
                             }
 
                         }
