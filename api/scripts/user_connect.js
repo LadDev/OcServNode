@@ -118,8 +118,9 @@ const syncUsers = async () => {
                                         await Users.updateMany({client_id: new Types.ObjectId(client.id)}, {$set: {group: findSubscr.group}})
                                     }
                                 }
-                                await syncUsers()
                             }
+
+                            await syncUsers()
 
                         }
                     }
