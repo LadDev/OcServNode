@@ -7,6 +7,10 @@ const {dbConnect} = require("../db.connector");
 const OcctlExec = require("../classes/OcctlExec.class");
 const Nodes = require("../models/Nodes");
 const PurchasedSubscription = require("../models/PurchasedSubscription");
+const Subscriptions = require("../models/Subscriptions");
+const Clients = require("../models/Clients");
+const mongoose = require("mongoose");
+const {Types} = require("mongoose");
 
 (async () => {
     await dbConnect()
@@ -80,6 +84,22 @@ const PurchasedSubscription = require("../models/PurchasedSubscription");
                             purchasedNew.startDate = now.toISOString()
                             purchasedNew.endDate = twoDaysLater.toISOString()
                             await purchasedNew.save()
+
+                            const findSubscr = await Subscriptions.findOne({_id: purchasedNew.subscrId})
+                            if(findSubscr){
+                                user.group = findSubscr.group
+                                await user.save()
+
+                                if(user.client_id){
+                                    const client = await Clients.findOne({_id: user.client_id})
+                                    if(client){
+                                        client.group = findSubscr.group
+                                        await client.save()
+                                        await Users.updateMany({client_id: new Types.ObjectId(client.id)}, {$set: {group: findSubscr.group}})
+                                    }
+                                }
+                            }
+
                         }
                     }
                 }
