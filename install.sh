@@ -66,4 +66,6 @@ sudo mkdir -p /var/ocserv/groups
 
 iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o eth0 -j MASQUERADE; iptables -A FORWARD -s 10.0.0.0/24 -j ACCEPT; iptables -A FORWARD -d 10.0.0.0/24 -j ACCEPT
 
-
+sudo apt-get install iptables-persistent -y
+sudo service netfilter-persistent save
+sudo service netfilter-persistent start
